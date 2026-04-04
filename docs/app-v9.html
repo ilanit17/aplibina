@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — דף עבודה אינטראקטיבי + הדפסה</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #f6f3ee; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="./app-v8.html" title="Language Studio"></iframe>
+  <script>
+    const frame = document.getElementById('appFrame');
+
+    function patchWorksheetBehavior() {
+      const win = frame.contentWindow;
+      const doc = frame.contentDocument;
+      if (!win || !doc) return;
+
+      const worksheetSelect = doc.getElementById('worksheetQuestions');
+      if (worksheetSelect && !doc.getElementById('worksheetDualModeNote')) {
+        const note = doc.createElement('div');
+        note.id = 'worksheetDualModeNote';
+        note.className = 'small';
+        note.style.marginTop = '6px';
+        note.textContent = 'דף העבודה יוגדר כך שיתאים גם למענה אינטראקטיבי על המסך וגם להדפסה נקייה על דף.';
+        worksheetSelect.parentElement.appendChild(note);
+      }
+
+      const oldBuildSeparatePrompts = win.buildSeparatePrompts;
+      const oldRenderPreview = win.renderPreview;
+      const oldRenderAll = win.renderAll;
+
+      if (oldBuildSeparatePrompts && !win.__worksheetPromptPatched) {
+        win.buildSeparatePrompts = function(s) {
+          const prompts = oldBuildSeparatePrompts(s);
+          if (prompts['דף עבודה לתרגול']) {
+            prompts['דף עבודה לתרגול'] += '\n\nהנחיה נוספת חשובה לדף העבודה: דף העבודה חייב להתאים גם למענה אינטראקטיבי על המסך וגם להדפסה. לכן יש לבנות אותו כקובץ HTML עצמאי עם שדות מענה ברורים או אזורי כתיבה נוחים, כפתורי בדיקה/ניקוי רק אם הם אינם פוגעים בהדפסה, ועם CSS פנימי הכולל גם התאמת print. בהדפסה הדף צריך להישאר נקי, קריא, עם גבולות מתאימים לכתיבה, ללא אזורים מיותרים, וללא תלות בפעולות דיגיטליות.';
+          }
+          return prompts;
+        };
+        win.__worksheetPromptPatched = true;
+      }
+
+      if (oldRenderPreview && !win.__worksheetPreviewPatched) {
+        win.renderPreview = function(s) {
+          let html = oldRenderPreview(s);
+          html = html.replace(
+            /(<div class="demo-box"><strong>דף עבודה:<\/strong>\s*[^<]*<\/div>)/,
+            '$1<div class="demo-box"><strong>מצב דף העבודה:<\/strong> מותאם גם למענה אינטראקטיבי על המסך וגם להדפסה נקייה.<\/div>'
+          );
+          return html;
+        };
+        win.__worksheetPreviewPatched = true;
+      }
+
+      if (oldRenderAll && !win.__worksheetRenderPatched) {
+        win.renderAll = function() {
+          oldRenderAll();
+          if (win.currentTab === 'preview' || win.currentTab === 'prompts' || win.currentTab === 'html') {
+            oldRenderAll();
+          }
+        };
+        win.__worksheetRenderPatched = true;
+      }
+
+      if (typeof win.renderAll === 'function') {
+        win.renderAll();
+      }
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(patchWorksheetBehavior, 300);
+      setTimeout(patchWorksheetBehavior, 900);
+    });
+  </script>
+</body>
+</html>
