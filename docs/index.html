@@ -1,62 +1,26 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>סטודיו לשיעורי שפה — תצוגה מקדימה עובדת</title>
-<style>
-:root{--bg:#f6f3ee;--card:#ffffff;--text:#2c2a26;--muted:#6d685f;--border:#d8d2c8;--accent:#1d5c84;--accent2:#2f7bab;--accent-2:#eaf3f9;--accent-3:#d7e8f4;--shadow:0 4px 18px rgba(0,0,0,.06);--radius:16px}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,"Heebo",sans-serif;background:var(--bg);color:var(--text)}
-.header{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);color:#fff;padding:36px 20px;text-align:center}.header h1{margin:0 0 10px;font-size:2rem}.header p{margin:0;opacity:.95}
-.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 48px}.grid{display:grid;grid-template-columns:380px 1fr;gap:20px}.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-.form-card{padding:18px}.preview-card{overflow:hidden}.section{margin-bottom:14px}.label{display:block;font-weight:700;margin-bottom:6px}.hint{color:var(--muted);font-size:.9rem}.input,.select,.textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:12px;font:inherit;background:#fff}.textarea{min-height:88px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid var(--border);padding:8px 12px;border-radius:999px;background:#fff;cursor:pointer}.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}.checkboxes{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cb{display:flex;gap:8px;align-items:flex-start;background:#faf8f4;border:1px solid var(--border);padding:10px;border-radius:12px}.toolbar{display:flex;gap:10px;flex-wrap:wrap}.btn{padding:11px 14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font:inherit;cursor:pointer}.btn.secondary{background:#eef4f8;color:var(--accent);border:1px solid #cfe0ec}.tabs{display:flex;border-bottom:1px solid var(--border);background:#fbfaf7}.tab{padding:12px 16px;cursor:pointer;border:none;background:none;font:inherit;font-weight:700;color:var(--muted)}.tab.active{color:var(--accent);border-bottom:3px solid var(--accent)}.panel{padding:18px}.preview-shell{background:#f8fafc;border:1px solid #dde7ee;border-radius:14px;overflow:hidden}.slide{padding:28px;min-height:420px;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%)}.slide h2{margin-top:0;color:var(--accent)}.hero{display:flex;justify-content:space-between;gap:16px;align-items:center}.badge{display:inline-block;padding:5px 10px;border-radius:999px;background:#eaf3f9;color:var(--accent);font-size:.85rem;font-weight:700}.demo-box{background:#fff;border:1px dashed #bdd2e0;border-radius:12px;padding:12px;margin:10px 0}.question{background:#fff;border:1px solid #dce7ef;border-radius:12px;padding:14px;margin:12px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.small{font-size:.9rem;color:var(--muted)}.code{white-space:pre-wrap;background:#121826;color:#e5eef7;padding:16px;border-radius:12px;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:.88rem;overflow:auto}
-.footer-note{margin-top:12px;font-size:.88rem;color:var(--muted)}
-@media (max-width:980px){.grid{grid-template-columns:1fr}.row,.row3,.checkboxes{grid-template-columns:1fr}.header h1{font-size:1.5rem}}
-</style>
+  <meta charset="UTF-8" />
+  <meta http-equiv="refresh" content="0; url=./app-v2.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מפנה לגרסה המעודכנת</title>
+  <script>
+    window.location.replace('./app-v2.html');
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      padding: 40px;
+      background: #f6f3ee;
+      color: #2c2a26;
+    }
+    a { color: #1d5c84; }
+  </style>
 </head>
 <body>
-<div class="header"><h1>סטודיו לשיעורי שפה</h1><p>תכנון והפקת תוצרים פדגוגיים — מצגת, מצגת אינטראקטיבית, פעילות אינטראקטיבית ועוד</p></div>
-<div class="wrap"><div class="grid"><div class="card form-card">
-<div class="section"><label class="label">כיתת יעד</label><select id="grade" class="select"><option>כיתה ב</option><option>כיתה ג</option><option>כיתה ד</option><option>כיתה ה</option><option>כיתה ו</option><option>כיתה ז</option><option>כיתה ח</option><option>כיתה ט</option></select></div>
-<div class="section"><label class="label">תחום + מיומנות ליבה</label><select id="domain" class="select"><option>הבנת הנקרא</option><option>הבעה בכתב</option><option>לשון</option><option>ספרות</option><option>אוצר מילים</option></select></div>
-<div class="section"><label class="label">תת־מיומנות / רכיב ביצוע</label><input id="subskill" class="input" value="הסקת מסקנות" /></div>
-<div class="row section"><div><label class="label">שלב בהוראת המיומנות</label><select id="stage" class="select"><option>חשיפה / פתיחה</option><option selected>הקניה מפורשת</option><option>תרגול מונחה</option><option>תרגול עצמאי</option><option>העמקה</option><option>הערכה</option><option>חזרה / ביסוס</option></select></div><div><label class="label">רמת ביצוע</label><select id="level" class="select"><option>רמה 1 — איתור / זיהוי</option><option selected>רמה 2 — הבנה / ארגון</option><option>רמה 3 — הסקה / ביסוס</option><option>רמה 4 — הערכה / העברה</option></select></div></div>
-<div class="section"><label class="label">סוג תוצר</label><div class="chips" id="productChips"></div></div>
-<div id="youngSettings" class="section" style="display:none"><label class="label">התאמת שפה לכיתות הצעירות</label><div class="row"><div><label class="label small">רמת ניקוד</label><select id="nikud" class="select"><option>ללא ניקוד</option><option selected>ניקוד חלקי</option><option>ניקוד מלא</option></select></div><div><label class="label small">מה לנקד</label><select id="nikudWhat" class="select"><option selected>הוראות + מילים חדשות</option><option>רק הוראות</option><option>הכול</option></select></div></div><div class="footer-note">לכיתות ב׳–ג׳ מומלץ בדרך כלל ניקוד חלקי או מלא, בהתאם לרמת הכיתה.</div></div>
-<div class="section"><label class="label">מרכיבים שייכללו בתוצר</label><div class="checkboxes">
-<label class="cb"><input type="checkbox" checked data-part="פתיחה" />פתיחה לשיעור</label>
-<label class="cb"><input type="checkbox" checked data-part="דוגמה פתורה" />דוגמה פתורה</label>
-<label class="cb"><input type="checkbox" checked data-part="תרגול מונחה" />תרגול מונחה</label>
-<label class="cb"><input type="checkbox" checked data-part="תרגול עצמאי" />תרגול עצמאי</label>
-<label class="cb"><input type="checkbox" checked data-part="מחוון קצר" />מחוון קצר</label>
-<label class="cb"><input type="checkbox" checked data-part="מפתח תשובות" />מפתח תשובות</label>
-</div></div>
-<div class="section"><label class="label">מטרת הלמידה והדגשים הפדגוגיים</label><textarea id="goal" class="textarea">התלמידים יסיקו מידע שאינו נאמר במפורש, ינמקו את מסקנותיהם בעזרת רמזים מן הטקסט, ויתרגלו שיח קצר סביב תשובות שונות.</textarea></div>
-<div class="section"><label class="label">טקסט מקור / תוכן בסיס</label><textarea id="source" class="textarea">יואב ראה שהשמיים התקדרו. הוא סגר במהירות את החלון, אסף את הכביסה מהחבל ורץ לקרוא לאחותו פנימה.</textarea></div>
-<div class="toolbar"><button class="btn" id="generateBtn">צור תוצר</button><button class="btn secondary" id="downloadBtn">הורד HTML</button></div>
-</div>
-<div class="card preview-card"><div class="tabs"><button class="tab active" data-tab="preview">תצוגה מקדימה</button><button class="tab" data-tab="prompt">פרומפט</button><button class="tab" data-tab="html">קוד HTML</button></div><div class="panel" id="panel"></div></div></div></div>
-<script>
-const products=['דף עבודה','מצגת להקרנה','מצגת אינטראקטיבית','פעילות אינטראקטיבית','מבחן קצר','מערך שיעור'];
-let selectedProduct='מצגת אינטראקטיבית';let currentTab='preview';let latestHTML='';let latestPrompt='';
-const productChips=document.getElementById('productChips');
-products.forEach(p=>{const b=document.createElement('button');b.className='chip'+(p===selectedProduct?' active':'');b.textContent=p;b.onclick=()=>{selectedProduct=p;renderProductChips();renderAll();};productChips.appendChild(b);});
-function renderProductChips(){[...productChips.children].forEach(ch=>ch.classList.toggle('active',ch.textContent===selectedProduct));}
-function getState(){const grade=gradeEl.value;const parts=[...document.querySelectorAll('[data-part]')].filter(x=>x.checked).map(x=>x.dataset.part);return{grade,domain:domainEl.value,subskill:subskillEl.value,stage:stageEl.value,level:levelEl.value,product:selectedProduct,nikud:nikudEl.value,nikudWhat:nikudWhatEl.value,goal:goalEl.value,source:sourceEl.value,parts};}
-function maybeYoung(){const g=gradeEl.value;youngSettings.style.display=(g==='כיתה ב'||g==='כיתה ג')?'block':'none';}
-function buildPrompt(s){const nikudPart=(s.grade==='כיתה ב'||s.grade==='כיתה ג')?`\nהתאמת שפה לכיתות הצעירות: ${s.nikud}; מה לנקד: ${s.nikudWhat}.`:'';return `אתה מומחה בפיתוח חומרי הוראה בשפה העברית.\nקהל יעד: ${s.grade}.\nתחום: ${s.domain}.\nתת־מיומנות: ${s.subskill}.\nשלב בהוראה: ${s.stage}.\nרמת ביצוע: ${s.level}.\nסוג תוצר: ${s.product}.${nikudPart}\nמטרת הלמידה: ${s.goal}\nכלול בתוצר: ${s.parts.join('، ')}.\nהשתמש בתוכן הבא כבסיס: ${s.source}\nכתוב בעברית תקינה, RTL מלא, עיצוב קריא, והפק גם גרסה למורה בעת הצורך.`;}
-function buildPreviewHTML(s){const nikudLine=(s.grade==='כיתה ב'||s.grade==='כיתה ג')?`<div class="badge">${s.nikud} · ${s.nikudWhat}</div>`:'';
-if(s.product==='מצגת להקרנה'||s.product==='מצגת אינטראקטיבית'){const interactive=s.product==='מצגת אינטראקטיבית';return `<div class="preview-shell"><div class="slide"><div class="hero"><div><div class="badge">${s.grade}</div> ${nikudLine}<h2>${s.domain} — ${s.subskill}</h2><p>${s.goal}</p></div><div class="badge">${interactive?'מצגת אינטראקטיבית':'מצגת להקרנה'}</div></div><div class="demo-box"><strong>פתיחה:</strong> מה אפשר להבין על מזג האוויר, גם בלי שנכתב במפורש?</div><div class="demo-box"><strong>דוגמה פתורה:</strong> יואב אסף את הכביסה — מכאן אפשר להסיק שעומד לרדת גשם.</div><div class="question"><strong>תרגול מונחה:</strong> איזה רמז בטקסט עזר לכם להבין זאת?<div class="actions">${interactive?'<button class="btn secondary" onclick="this.nextElementSibling.style.display=\'block\'">חשיפת תשובה</button><div class="demo-box" style="display:none">הרמזים: השמיים התקדרו, הוא סגר חלון, אסף כביסה ורץ פנימה.</div>':'<div class="small">לדיון כיתתי מונחה</div>'}</div></div><div class="question"><strong>תרגול עצמאי:</strong> כתבו מסקנה אחת נוספת על תחושתו של יואב ונמקו.</div><div class="small">כלול בתוצר: ${s.parts.join(' • ')}</div></div></div>`;}
-if(s.product==='פעילות אינטראקטיבית'){return `<div class="preview-shell"><div class="slide"><h2>${s.domain} — פעילות אינטראקטיבית</h2><p>${s.goal}</p><div class="question"><strong>1. בחירה:</strong> מה אפשר להסיק מן הטקסט?<div class="actions"><button class="btn secondary" onclick="alert('נכון — עומד לרדת גשם')">עומד לרדת גשם</button><button class="btn secondary" onclick="alert('נסו שוב')">השמש זורחת</button></div></div><div class="question"><strong>2. השלמה:</strong> איזה רמז הוביל למסקנה שלכם?<div class="demo-box">__________</div></div><div class="question"><strong>3. משוב:</strong> נסחו תשובה מלאה: אני מסיק/ה ש..., כי...</div></div></div>`;}
-if(s.product==='דף עבודה'){return `<div class="preview-shell"><div class="slide"><h2>דף עבודה — ${s.domain}</h2><div class="demo-box"><strong>מטרה:</strong> ${s.goal}</div><div class="question">קראו את הקטע וענו על השאלות.</div><ol><li>מה קרה בטקסט?</li><li>מה אפשר להסיק שאינו נאמר במפורש?</li><li>על איזה רמז הסתמכתם?</li></ol></div></div>`;}
-if(s.product==='מבחן קצר'){return `<div class="preview-shell"><div class="slide"><h2>מבחן קצר — ${s.subskill}</h2><div class="question">שאלה 1: סמנו את המסקנה המתאימה ביותר.</div><div class="question">שאלה 2: נמקו בעזרת שני רמזים מן הטקסט.</div><div class="question">שאלה 3: כתבו תשובה מלאה ומסודרת.</div></div></div>`;}
-return `<div class="preview-shell"><div class="slide"><h2>מערך שיעור — ${s.domain}</h2><div class="demo-box"><strong>פתיחה:</strong> שאלה מעוררת</div><div class="demo-box"><strong>הקניה:</strong> מידול של המיומנות</div><div class="demo-box"><strong>תרגול:</strong> מונחה ואז עצמאי</div><div class="demo-box"><strong>סיכום:</strong> רפלקציה קצרה</div></div></div>`;}
-function buildDownloadHTML(s){return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${s.product} — ${s.domain}</title><style>body{font-family:Arial,sans-serif;direction:rtl;padding:24px;background:#f6f8fb} .box{background:#fff;border:1px solid #d6dee7;border-radius:14px;padding:20px;max-width:900px;margin:auto} h1{color:#1d5c84} .q{border:1px solid #dce7ef;border-radius:12px;padding:12px;margin:12px 0;background:#fff}</style></head><body><div class="box"><h1>${s.product}</h1><h2>${s.domain} — ${s.subskill}</h2><p><strong>כיתה:</strong> ${s.grade}</p><p><strong>מטרה:</strong> ${s.goal}</p>${buildPreviewHTML(s)}</div></body></html>`;}
-function renderPreview(s){return buildPreviewHTML(s);} function renderPrompt(s){return '<div class="code">'+escapeHtml(buildPrompt(s))+'</div>';} function renderHTMLTab(){return '<div class="code">'+escapeHtml(latestHTML)+'</div>';} function escapeHtml(str){return str.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
-function renderAll(){const s=getState();latestPrompt=buildPrompt(s);latestHTML=buildDownloadHTML(s);panel.innerHTML=currentTab==='preview'?renderPreview(s):currentTab==='prompt'?renderPrompt(s):renderHTMLTab();}
-const tabs=document.querySelectorAll('.tab');tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');currentTab=t.dataset.tab;renderAll();});
-const gradeEl=document.getElementById('grade'),domainEl=document.getElementById('domain'),subskillEl=document.getElementById('subskill'),stageEl=document.getElementById('stage'),levelEl=document.getElementById('level'),nikudEl=document.getElementById('nikud'),nikudWhatEl=document.getElementById('nikudWhat'),goalEl=document.getElementById('goal'),sourceEl=document.getElementById('source'),youngSettings=document.getElementById('youngSettings');
-[gradeEl,domainEl,subskillEl,stageEl,levelEl,nikudEl,nikudWhatEl,goalEl,sourceEl].forEach(el=>el.addEventListener('input',()=>{maybeYoung();renderAll();}));document.querySelectorAll('[data-part]').forEach(el=>el.addEventListener('change',renderAll));
-document.getElementById('generateBtn').onclick=renderAll;document.getElementById('downloadBtn').onclick=()=>{const blob=new Blob([latestHTML],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='language-studio-output.html';a.click();URL.revokeObjectURL(a.href);};
-maybeYoung();renderProductChips();renderAll();
-</script></body></html>
+  <p>מעבירה לגרסה המעודכנת של האפליקציה...</p>
+  <p><a href="./app-v2.html">אם ההפניה לא עבדה, לחצי כאן</a></p>
+</body>
+</html>
