@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — תיקון יציב</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #f3f7fb; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="./app-v14.html" title="Language Studio"></iframe>
+  <script>
+    const frame = document.getElementById('appFrame');
+
+    const autoGoals = {
+      'הבנת הנקרא': {
+        'הפקת מידע גלוי': {
+          baseGoal: 'התלמידים יאתרו מידע מפורש בטקסט, יזהו פרטים רלוונטיים ויענו על שאלות הנשענות ישירות על הכתוב.',
+          baseFocus: 'יש לכוון את התלמידים לקריאה מדויקת של הטקסט, להבחנה בין עיקר לבין פרט רלוונטי, ולהישענות ישירה על מידע גלוי.'
+        },
+        'הסקת מסקנות': {
+          baseGoal: 'התלמידים יסיקו מידע שאינו נאמר במפורש בטקסט, על סמך רמזים ופרטים המופיעים בו.',
+          baseFocus: 'יש לעודד איסוף רמזים מן הטקסט, קישור בין פרטים, וניסוח מסקנה סבירה המבוססת על הכתוב.'
+        },
+        'פרשנות והערכת טקסט': {
+          baseGoal: 'התלמידים יפרשו את הטקסט, יעמדו על כוונת הכותב, המסר או העמדה, ויביעו התייחסות מבוססת כלפיו.',
+          baseFocus: 'יש לכוון את התלמידים להתבוננות במשמעות רחבה של הטקסט, בזיהוי המסר או העמדה, ובהסבר המבוסס על פרטים לשוניים, מבניים או רעיוניים.'
+        }
+      },
+      'הבעה בכתב': {
+        'כתיבת תשובה מנומקת': {
+          baseGoal: 'התלמידים יכתבו תשובה מלאה הכוללת מענה ברור לשאלה, נימוק מתאים ובמידת הצורך גם דוגמה או ביסוס מן הטקסט.',
+          baseFocus: 'יש להדגיש מבנה ברור של תשובה, קשר ישיר לשאלה, ניסוח מדויק, ושילוב נימוק רלוונטי ומבוסס.'
+        },
+        'כתיבת טיעון': {
+          baseGoal: 'התלמידים ינסחו עמדה ברורה בנושא נתון, יבססו אותה באמצעות נימוקים מתאימים ויארגנו את דבריהם באופן משכנע.',
+          baseFocus: 'יש להדגיש ניסוח טענה ברורה, בחירת נימוקים רלוונטיים, שימוש בקישוריות מתאימה וארגון מסודר של הטקסט.'
+        },
+        'כתיבה מידעית / סיכום': {
+          baseGoal: 'התלמידים ימסרו מידע באופן מאורגן, יבחינו בין עיקר לטפל וינסחו טקסט בהיר, מדויק ותמציתי.',
+          baseFocus: 'יש לעודד ארגון מידע, בחירה של פרטים מרכזיים בלבד, שימוש בניסוח בהיר ושמירה על רצף לוגי.'
+        }
+      },
+      'לשון': {
+        'מילות קישור': {
+          baseGoal: 'התלמידים יזהו מילות קישור, יבינו את תפקידן וישתמשו בהן בהקשר מתאים במשפטים ובטקסטים.',
+          baseFocus: 'יש ללמד את משמעותן של מילות הקישור בהקשר, להציג דוגמאות ברורות ולתרגל זיהוי ושימוש בהתאם ליחסים הלוגיים שהן מבטאות.'
+        },
+        'נושא ונשוא / תחביר': {
+          baseGoal: 'התלמידים יזהו רכיבים מרכזיים במשפט, יבינו את תפקידם ויעשו שימוש בידע התחבירי לצורך הבנה וכתיבה.',
+          baseFocus: 'יש להדגיש את מבנה המשפט, את תפקידי הרכיבים המרכזיים ואת הקשר בין זיהוי תחבירי לבין הבנת משמעות.'
+        },
+        'דיוק לשוני ועריכה': {
+          baseGoal: 'התלמידים יזהו שגיאות לשוניות, יתקנו אותן וישפרו ניסוח של מילים, משפטים או טקסטים.',
+          baseFocus: 'יש לטפח מודעות לשונית, לעודד בדיקה עצמית של טקסט, ולהדגיש ניסוח מדויק, תקין ובהיר.'
+        }
+      },
+      'ספרות': {
+        'אפיון דמות': {
+          baseGoal: 'התלמידים יאפיינו דמות ביצירה על סמך מעשיה, דבריה, רגשותיה ויחס הדמויות האחרות כלפיה.',
+          baseFocus: 'יש לעודד ביסוס של האפיון על פרטים מן היצירה, קישור בין התנהגות לתכונות, והבחנה בין תיאור ישיר לבין אפיון עקיף.'
+        },
+        'מסר ונושא ביצירה': {
+          baseGoal: 'התלמידים יזהו את הנושא המרכזי או המסר ביצירה ויקשרו בינו לבין פרטים מהטקסט.',
+          baseFocus: 'יש לכוון את התלמידים לזיהוי רעיונות מרכזיים, לביסוס המסר על היצירה עצמה, ולהבחנה בין פרטים משניים לבין רעיונות מרכזיים.'
+        },
+        'אמצעים ספרותיים בסיסיים': {
+          baseGoal: 'התלמידים יזהו אמצעים ספרותיים בסיסיים ויבינו את תרומתם למשמעות, לאווירה או לאפקט ביצירה.',
+          baseFocus: 'יש להציג את האמצעי בתוך הקשר, להסביר את תרומתו, ולעודד חיבור בין הזיהוי הפורמלי לבין משמעותו ביצירה.'
+        }
+      },
+      'אוצר מילים': {
+        'הבנת מילה בהקשר': {
+          baseGoal: 'התלמידים יבינו משמעות של מילה על סמך ההקשר שבו היא מופיעה במשפט או בטקסט.',
+          baseFocus: 'יש לעודד שימוש ברמזים סמוכים, בהקשר הרחב ובפירושים אפשריים כדי להגיע למשמעות המתאימה.'
+        },
+        'מילים נרדפות והפכים': {
+          baseGoal: 'התלמידים ירחיבו את אוצר המילים שלהם באמצעות זיהוי קשרי משמעות בין מילים ושימוש מתאים בהן.',
+          baseFocus: 'יש להדגיש קשרים בין מילים, לדייק בהבדלים דקים במשמעות ולעודד שימוש במילים בהקשר.'
+        },
+        'משפחות מילים ושורש': {
+          baseGoal: 'התלמידים יזהו קשרים בין מילים מאותו שורש או מאותה משפחת מילים וייעזרו בכך להבנת משמעות ולהרחבת אוצר המילים.',
+          baseFocus: 'יש להבליט את הקשר בין מבנה המילה למשמעותה, לעודד השוואה בין מילים קרובות ולהשתמש בדוגמאות בהקשר.'
+        }
+      }
+    };
+    const stageAdditions = {
+      'חשיפה / פתיחה': { goal:'התלמידים יפתחו היכרות ראשונית עם המיומנות ויעוררו חשיבה לקראתה.', focus:'יש ליצור פתיחה מסקרנת, לקשר לידע קודם ולהימנע מעומס של הסבר שיטתי מלא.' },
+      'הקניה מפורשת': { goal:'התלמידים יבינו מהי המיומנות וכיצד פועלים בה באופן ברור ומפורש.', focus:'יש לכלול הסבר ישיר, פירוק לשלבים, דוגמה פתורה או מודל ברור.' },
+      'תרגול מונחה': { goal:'התלמידים יתנסו ביישום המיומנות בעזרת תמיכה והכוונה.', focus:'יש לכלול רמזים, שאלות עזר, תיווך ותרגול מדורג.' },
+      'תרגול עצמאי': { goal:'התלמידים יישמו את המיומנות באופן עצמאי.', focus:'יש להפחית תמיכות, לשמור על הוראות ברורות ולעודד ביצוע עצמאי.' },
+      'העמקה': { goal:'התלמידים ירחיבו ויעמיקו את השימוש במיומנות ברמת מורכבות גבוהה יותר.', focus:'יש לשלב ניתוח, השוואה, נימוק, חיבור בין פרטים או העברה להקשר חדש.' },
+      'הערכה': { goal:'התלמידים יפגינו את רמת שליטתם במיומנות במשימות מותאמות.', focus:'יש לצמצם רמזים, לדייק את המשימות ולכלול קריטריונים ברורים להצלחה.' },
+      'חזרה / ביסוס': { goal:'התלמידים ירעננו, יחזקו ויבססו מיומנות שכבר נלמדה.', focus:'יש לכלול תזכורת קצרה לעקרונות מרכזיים ותרגול ממוקד ולא עמוס.' }
+    };
+    const performanceAdditions = {
+      'בסיסית — זיהוי / איתור / תשובה קצרה': { goal:'ברמת ביצוע בסיסית של זיהוי, איתור או מענה קצר.', focus:'יש לשמור על משימות ממוקדות, ברורות ופשוטות יחסית.' },
+      'בינונית — הסבר / ארגון / נימוק': { goal:'ברמת ביצוע בינונית הכוללת הסבר, ארגון מידע או נימוק.', focus:'יש לעודד תשובות מלאות יותר, הסבר ברור וארגון מתאים של המידע.' },
+      'מתקדמת — הסקה / ביסוס / השוואה': { goal:'ברמת ביצוע מתקדמת הכוללת הסקה, ביסוס והשוואה.', focus:'יש לדרוש קישור בין פרטים, ביסוס מן הטקסט או השוואה בין רעיונות.' },
+      'מעמיקה — הערכה / העברה / יצירה': { goal:'ברמת ביצוע מעמיקה הכוללת הערכה, העברה או יצירה.', focus:'יש לעודד חשיבה מורכבת, שיפוט, הכללה או יצירת תוצר עצמאי.' }
+    };
+
+    function ageBandAdditions(grade){
+      if (grade==='כיתה ב' || grade==='כיתה ג') return {goal:'בהתאמה לשפה פשוטה וליכולת הקריאה של תלמידים צעירים.', focus:'יש לשמור על שפה פשוטה, הוראות קצרות, ריווח נוח, עומס נמוך ולעיתים גם ניקוד.'};
+      if (grade==='כיתה ד' || grade==='כיתה ה' || grade==='כיתה ו') return {goal:'בהתאמה לרמת ביניים המשלבת בהירות עם עלייה הדרגתית בעצמאות.', focus:'יש לשמור על בהירות, תרגול מדורג ועומס טקסטואלי מתון.'};
+      return {goal:'בהתאמה ללומדים בוגרים יותר ולדרישה גבוהה יותר לעצמאות ולנימוק.', focus:'אפשר לדרוש יותר עצמאות, ניתוח, ביסוס והעמקה.'};
+    }
+
+    function buildAutoGoalAndFocus({domain, subskill, stage, level, grade}){
+      const skill = autoGoals?.[domain]?.[subskill];
+      const stagePart = stageAdditions?.[stage];
+      const levelPart = performanceAdditions?.[level];
+      const agePart = ageBandAdditions(grade);
+      if(!skill || !stagePart || !levelPart) return null;
+      return {
+        goal: `${skill.baseGoal} ${stagePart.goal} ${levelPart.goal} ${agePart.goal}`,
+        focus: `${skill.baseFocus} ${stagePart.focus} ${levelPart.focus} ${agePart.focus}`
+      };
+    }
+
+    function patch(){
+      const win = frame.contentWindow;
+      const doc = frame.contentDocument;
+      if(!win || !doc) return;
+
+      const domainEl = doc.getElementById('domain');
+      const subskillEl = doc.getElementById('subskill');
+      const stageEl = doc.getElementById('stage');
+      const levelEl = doc.getElementById('level');
+      const gradeEl = doc.getElementById('grade');
+      const goalEl = doc.getElementById('goal');
+      const skillInfoEl = doc.getElementById('skillInfo');
+      if(!domainEl || !subskillEl || !stageEl || !levelEl || !gradeEl || !goalEl || !skillInfoEl) return;
+
+      function refreshGoal(force=false){
+        if (!force && goalEl.dataset.userEdited === '1') return;
+        const built = buildAutoGoalAndFocus({
+          domain: domainEl.value,
+          subskill: subskillEl.value,
+          stage: stageEl.value,
+          level: levelEl.value,
+          grade: gradeEl.value
+        });
+        if(!built) return;
+        goalEl.value = `מטרת הלמידה: ${built.goal}\n\nדגשים פדגוגיים: ${built.focus}`;
+        goalEl.dataset.userEdited = '0';
+        if (typeof win.renderAll === 'function') win.renderAll();
+      }
+
+      function refreshSkillBox(){
+        const cat = win.skillCatalog?.[domainEl.value]?.[subskillEl.value];
+        if(!cat) return;
+        skillInfoEl.innerHTML = `<h3>${subskillEl.value}</h3><p>${cat.short}</p><div class="small"><strong>מטרת המיקוד:</strong> ${cat.purpose}</div><ul class="info-list">${cat.look.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+      }
+
+      goalEl.removeEventListener?.('input', win.__goalMarkEdited);
+      win.__goalMarkEdited = () => { goalEl.dataset.userEdited = '1'; };
+      goalEl.addEventListener('input', win.__goalMarkEdited);
+
+      if (!win.__patchedListeners) {
+        [domainEl, subskillEl, stageEl, levelEl, gradeEl].forEach(el => {
+          el.addEventListener('change', () => { refreshSkillBox(); refreshGoal(false); });
+          el.addEventListener('input', () => { refreshSkillBox(); refreshGoal(false); });
+        });
+        const fillBtn = doc.getElementById('fillAutoGoalBtn');
+        const shortBtn = doc.getElementById('shortAutoGoalBtn');
+        const longBtn = doc.getElementById('longAutoGoalBtn');
+        if (fillBtn) fillBtn.onclick = () => refreshGoal(true);
+        if (shortBtn) shortBtn.onclick = () => {
+          const built = buildAutoGoalAndFocus({domain:domainEl.value, subskill:subskillEl.value, stage:stageEl.value, level:levelEl.value, grade:gradeEl.value});
+          if(!built) return;
+          const g = built.goal.split('. ').slice(0,2).join('. ');
+          const f = built.focus.split('. ').slice(0,2).join('. ');
+          goalEl.value = `מטרת הלמידה: ${g}\n\nדגשים פדגוגיים: ${f}`;
+          goalEl.dataset.userEdited = '0';
+          if (typeof win.renderAll === 'function') win.renderAll();
+        };
+        if (longBtn) longBtn.onclick = () => {
+          const built = buildAutoGoalAndFocus({domain:domainEl.value, subskill:subskillEl.value, stage:stageEl.value, level:levelEl.value, grade:gradeEl.value});
+          if(!built) return;
+          goalEl.value = `מטרת הלמידה: ${built.goal} התוצרים צריכים לשקף באופן ברור את המיומנות, את שלב ההוראה ואת רמת המורכבות שנבחרה.\n\nדגשים פדגוגיים: ${built.focus} יש להקפיד על הלימה בין סוג התוצר, אופי המשימות, היקף התמיכה ורמת העצמאות הנדרשת מן הלומדים.`;
+          goalEl.dataset.userEdited = '0';
+          if (typeof win.renderAll === 'function') win.renderAll();
+        };
+        win.__patchedListeners = true;
+      }
+
+      if (typeof win.copyPrompt !== 'function') {
+        win.copyPrompt = async function(title){
+          const text = win.latestPrompts?.[title];
+          if(!text) return;
+          try { await navigator.clipboard.writeText(text); alert(`הפרומפט של "${title}" הועתק`); }
+          catch(e){ alert('לא הצלחתי להעתיק אוטומטית. אפשר לסמן ולהעתיק ידנית.'); }
+        };
+      }
+
+      refreshSkillBox();
+      refreshGoal(false);
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(patch, 300);
+      setTimeout(patch, 900);
+      setTimeout(patch, 1800);
+    });
+  </script>
+</body>
+</html>
