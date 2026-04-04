@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — גרסה מתוקנת</title>
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:linear-gradient(180deg,#eef4f8 0%,#f7fafc 100%); }
+    iframe { width:100%; height:100%; border:0; display:block; background:transparent; }
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="./app-v10.html" title="Language Studio"></iframe>
+  <script>
+    const frame = document.getElementById('appFrame');
+
+    const autoGoals = {
+      'הבנת הנקרא': {
+        'הפקת מידע גלוי': {
+          baseGoal: 'התלמידים יאתרו מידע מפורש בטקסט, יזהו פרטים רלוונטיים ויענו על שאלות הנשענות ישירות על הכתוב.',
+          baseFocus: 'יש לכוון את התלמידים לקריאה מדויקת של הטקסט, להבחנה בין עיקר לבין פרט רלוונטי, ולהישענות ישירה על מידע גלוי.'
+        },
+        'הסקת מסקנות': {
+          baseGoal: 'התלמידים יסיקו מידע שאינו נאמר במפורש בטקסט, על סמך רמזים ופרטים המופיעים בו.',
+          baseFocus: 'יש לעודד איסוף רמזים מן הטקסט, קישור בין פרטים, וניסוח מסקנה סבירה המבוססת על הכתוב.'
+        },
+        'פרשנות והערכת טקסט': {
+          baseGoal: 'התלמידים יפרשו את הטקסט, יעמדו על כוונת הכותב, המסר או העמדה, ויביעו התייחסות מבוססת כלפיו.',
+          baseFocus: 'יש לכוון את התלמידים להתבוננות במשמעות רחבה של הטקסט, בזיהוי המסר או העמדה, ובהסבר המבוסס על פרטים לשוניים, מבניים או רעיוניים.'
+        }
+      },
+      'הבעה בכתב': {
+        'כתיבת תשובה מנומקת': {
+          baseGoal: 'התלמידים יכתבו תשובה מלאה הכוללת מענה ברור לשאלה, נימוק מתאים ובמידת הצורך גם דוגמה או ביסוס מן הטקסט.',
+          baseFocus: 'יש להדגיש מבנה ברור של תשובה, קשר ישיר לשאלה, ניסוח מדויק, ושילוב נימוק רלוונטי ומבוסס.'
+        },
+        'כתיבת טיעון': {
+          baseGoal: 'התלמידים ינסחו עמדה ברורה בנושא נתון, יבססו אותה באמצעות נימוקים מתאימים ויארגנו את דבריהם באופן משכנע.',
+          baseFocus: 'יש להדגיש ניסוח טענה ברורה, בחירת נימוקים רלוונטיים, שימוש בקישוריות מתאימה וארגון מסודר של הטקסט.'
+        },
+        'כתיבה מידעית / סיכום': {
+          baseGoal: 'התלמידים ימסרו מידע באופן מאורגן, יבחינו בין עיקר לטפל וינסחו טקסט בהיר, מדויק ותמציתי.',
+          baseFocus: 'יש לעודד ארגון מידע, בחירה של פרטים מרכזיים בלבד, שימוש בניסוח בהיר ושמירה על רצף לוגי.'
+        }
+      },
+      'לשון': {
+        'מילות קישור': {
+          baseGoal: 'התלמידים יזהו מילות קישור, יבינו את תפקידן וישתמשו בהן בהקשר מתאים במשפטים ובטקסטים.',
+          baseFocus: 'יש ללמד את משמעותן של מילות הקישור בהקשר, להציג דוגמאות ברורות ולתרגל זיהוי ושימוש בהתאם ליחסים הלוגיים שהן מבטאות.'
+        },
+        'נושא ונשוא / תחביר': {
+          baseGoal: 'התלמידים יזהו רכיבים מרכזיים במשפט, יבינו את תפקידם ויעשו שימוש בידע התחבירי לצורך הבנה וכתיבה.',
+          baseFocus: 'יש להדגיש את מבנה המשפט, את תפקידי הרכיבים המרכזיים ואת הקשר בין זיהוי תחבירי לבין הבנת משמעות.'
+        },
+        'דיוק לשוני ועריכה': {
+          baseGoal: 'התלמידים יזהו שגיאות לשוניות, יתקנו אותן וישפרו ניסוח של מילים, משפטים או טקסטים.',
+          baseFocus: 'יש לטפח מודעות לשונית, לעודד בדיקה עצמית של טקסט, ולהדגיש ניסוח מדויק, תקין ובהיר.'
+        }
+      },
+      'ספרות': {
+        'אפיון דמות': {
+          baseGoal: 'התלמידים יאפיינו דמות ביצירה על סמך מעשיה, דבריה, רגשותיה ויחס הדמויות האחרות כלפיה.',
+          baseFocus: 'יש לעודד ביסוס של האפיון על פרטים מן היצירה, קישור בין התנהגות לתכונות, והבחנה בין תיאור ישיר לבין אפיון עקיף.'
+        },
+        'מסר ונושא ביצירה': {
+          baseGoal: 'התלמידים יזהו את הנושא המרכזי או המסר ביצירה ויקשרו בינו לבין פרטים מהטקסט.',
+          baseFocus: 'יש לכוון את התלמידים לזיהוי רעיונות מרכזיים, לביסוס המסר על היצירה עצמה, ולהבחנה בין פרטים משניים לבין רעיונות מרכזיים.'
+        },
+        'אמצעים ספרותיים בסיסיים': {
+          baseGoal: 'התלמידים יזהו אמצעים ספרותיים בסיסיים ויבינו את תרומתם למשמעות, לאווירה או לאפקט ביצירה.',
+          baseFocus: 'יש להציג את האמצעי בתוך הקשר, להסביר את תרומתו, ולעודד חיבור בין הזיהוי הפורמלי לבין משמעותו ביצירה.'
+        }
+      },
+      'אוצר מילים': {
+        'הבנת מילה בהקשר': {
+          baseGoal: 'התלמידים יבינו משמעות של מילה על סמך ההקשר שבו היא מופיעה במשפט או בטקסט.',
+          baseFocus: 'יש לעודד שימוש ברמזים סמוכים, בהקשר הרחב ובפירושים אפשריים כדי להגיע למשמעות המתאימה.'
+        },
+        'מילים נרדפות והפכים': {
+          baseGoal: 'התלמידים ירחיבו את אוצר המילים שלהם באמצעות זיהוי קשרי משמעות בין מילים ושימוש מתאים בהן.',
+          baseFocus: 'יש להדגיש קשרים בין מילים, לדייק בהבדלים דקים במשמעות ולעודד שימוש במילים בהקשר.'
+        },
+        'משפחות מילים ושורש': {
+          baseGoal: 'התלמידים יזהו קשרים בין מילים מאותו שורש או מאותה משפחת מילים וייעזרו בכך להבנת משמעות ולהרחבת אוצר המילים.',
+          baseFocus: 'יש להבליט את הקשר בין מבנה המילה למשמעותה, לעודד השוואה בין מילים קרובות ולהשתמש בדוגמאות בהקשר.'
+        }
+      }
+    };
+    const stageAdditions = {
+      'חשיפה / פתיחה': { goal:'התלמידים יפתחו היכרות ראשונית עם המיומנות ויעוררו חשיבה לקראתה.', focus:'יש ליצור פתיחה מסקרנת, לקשר לידע קודם ולהימנע מעומס של הסבר שיטתי מלא.'},
+      'הקניה מפורשת': { goal:'התלמידים יבינו מהי המיומנות וכיצד פועלים בה באופן ברור ומפורש.', focus:'יש לכלול הסבר ישיר, פירוק לשלבים, דוגמה פתורה או מודל ברור.'},
+      'תרגול מונחה': { goal:'התלמידים יתנסו ביישום המיומנות בעזרת תמיכה והכוונה.', focus:'יש לכלול רמזים, שאלות עזר, תיווך ותרגול מדורג.'},
+      'תרגול עצמאי': { goal:'התלמידים יישמו את המיומנות באופן עצמאי.', focus:'יש להפחית תמיכות, לשמור על הוראות ברורות ולעודד ביצוע עצמאי.'},
+      'העמקה': { goal:'התלמידים ירחיבו ויעמיקו את השימוש במיומנות ברמת מורכבות גבוהה יותר.', focus:'יש לשלב ניתוח, השוואה, נימוק, חיבור בין פרטים או העברה להקשר חדש.'},
+      'הערכה': { goal:'התלמידים יפגינו את רמת שליטתם במיומנות במשימות מותאמות.', focus:'יש לצמצם רמזים, לדייק את המשימות ולכלול קריטריונים ברורים להצלחה.'},
+      'חזרה / ביסוס': { goal:'התלמידים ירעננו, יחזקו ויבססו מיומנות שכבר נלמדה.', focus:'יש לכלול תזכורת קצרה לעקרונות מרכזיים ותרגול ממוקד ולא עמוס.'}
+    };
+    const performanceAdditions = {
+      'בסיסית — זיהוי / איתור / תשובה קצרה': { goal:'ברמת ביצוע בסיסית של זיהוי, איתור או מענה קצר.', focus:'יש לשמור על משימות ממוקדות, ברורות ופשוטות יחסית.'},
+      'בינונית — הסבר / ארגון / נימוק': { goal:'ברמת ביצוע בינונית הכוללת הסבר, ארגון מידע או נימוק.', focus:'יש לעודד תשובות מלאות יותר, הסבר ברור וארגון מתאים של המידע.'},
+      'מתקדמת — הסקה / ביסוס / השוואה': { goal:'ברמת ביצוע מתקדמת הכוללת הסקה, ביסוס והשוואה.', focus:'יש לדרוש קישור בין פרטים, ביסוס מן הטקסט או השוואה בין רעיונות.'},
+      'מעמיקה — הערכה / העברה / יצירה': { goal:'ברמת ביצוע מעמיקה הכוללת הערכה, העברה או יצירה.', focus:'יש לעודד חשיבה מורכבת, שיפוט, הכללה או יצירת תוצר עצמאי.'}
+    };
+
+    function ageBandAdditions(grade){
+      if (grade==='כיתה ב' || grade==='כיתה ג') return {goal:'בהתאמה לשפה פשוטה וליכולת הקריאה של תלמידים צעירים.', focus:'יש לשמור על שפה פשוטה, הוראות קצרות, ריווח נוח, עומס נמוך ולעיתים גם ניקוד.'};
+      if (grade==='כיתה ד' || grade==='כיתה ה' || grade==='כיתה ו') return {goal:'בהתאמה לרמת ביניים המשלבת בהירות עם עלייה הדרגתית בעצמאות.', focus:'יש לשמור על בהירות, תרגול מדורג ועומס טקסטואלי מתון.'};
+      return {goal:'בהתאמה ללומדים בוגרים יותר ולדרישה גבוהה יותר לעצמאות ולנימוק.', focus:'אפשר לדרוש יותר עצמאות, ניתוח, ביסוס והעמקה.'};
+    }
+
+    function buildAutoGoalAndFocus({domain, subskill, stage, level, grade}){
+      const skill = autoGoals?.[domain]?.[subskill];
+      const stagePart = stageAdditions?.[stage];
+      const levelPart = performanceAdditions?.[level];
+      const agePart = ageBandAdditions(grade);
+      if(!skill || !stagePart || !levelPart) return null;
+      return {
+        goal: `${skill.baseGoal} ${stagePart.goal} ${levelPart.goal} ${agePart.goal}`,
+        focus: `${skill.baseFocus} ${stagePart.focus} ${levelPart.focus} ${agePart.focus}`
+      };
+    }
+
+    function enhance(){
+      const doc = frame.contentDocument;
+      const win = frame.contentWindow;
+      if(!doc || !win) return;
+
+      if (!doc.getElementById('strong-modern-fonts')) {
+        const pre1 = doc.createElement('link'); pre1.rel='preconnect'; pre1.href='https://fonts.googleapis.com'; doc.head.appendChild(pre1);
+        const pre2 = doc.createElement('link'); pre2.rel='preconnect'; pre2.href='https://fonts.gstatic.com'; pre2.crossOrigin='anonymous'; doc.head.appendChild(pre2);
+        const fonts = doc.createElement('link'); fonts.id='strong-modern-fonts'; fonts.rel='stylesheet'; fonts.href='https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@400;500;700&display=swap'; doc.head.appendChild(fonts);
+      }
+
+      let style = doc.getElementById('strong-modern-style');
+      if(!style){ style = doc.createElement('style'); style.id='strong-modern-style'; doc.head.appendChild(style); }
+      style.textContent = `
+        :root{--accent:#0a7897 !important; --accent2:#2fa7c0 !important; --text:#1f2937 !important; --muted:#667085 !important; --border:#d9e6ef !important;}
+        html,body{font-family:'Heebo','Rubik',Arial,sans-serif !important; background:linear-gradient(180deg,#f3f8fb 0%,#eef4f8 45%,#f7fafc 100%) !important; color:#1f2937 !important;}
+        .header{background:linear-gradient(135deg,#0a7897 0%,#1689a8 55%,#2fa7c0 100%) !important; box-shadow:0 16px 40px rgba(10,120,151,.26) !important; padding:46px 24px !important;}
+        .header h1{font-family:'Rubik','Heebo',Arial,sans-serif !important; font-size:2.2rem !important; font-weight:700 !important; margin-bottom:10px !important;}
+        .wrap{max-width:1500px !important; padding:28px 20px 48px !important;}
+        .grid{grid-template-columns:minmax(430px,540px) 1fr !important; gap:26px !important; align-items:start !important;}
+        .card,.form-card,.preview-card{border-radius:26px !important; box-shadow:0 18px 50px rgba(15,23,42,.09) !important; border:1px solid rgba(214,226,236,.95) !important; background:rgba(255,255,255,.97) !important;}
+        .form-card{padding:24px !important;} .panel{padding:24px !important;} .section{margin-bottom:20px !important;}
+        .label{font-size:1rem !important; font-weight:800 !important; color:#24384d !important; margin-bottom:8px !important;}
+        .small{font-size:.92rem !important; line-height:1.55 !important; color:#667085 !important;}
+        .input,.select,.textarea{font-family:'Heebo','Rubik',Arial,sans-serif !important; border-radius:18px !important; padding:13px 15px !important; border:1px solid #d7e3ec !important; background:#fbfdff !important; box-shadow:inset 0 1px 2px rgba(15,23,42,.03) !important; transition:border-color .18s ease, box-shadow .18s ease, transform .12s ease !important;}
+        .input:focus,.select:focus,.textarea:focus{outline:none !important; border-color:#1689a8 !important; box-shadow:0 0 0 4px rgba(22,137,168,.12) !important; background:#fff !important;}
+        .textarea{min-height:150px !important; font-size:1rem !important; line-height:1.7 !important;}
+        .subcard,.stage-box,.skill-box,.product-box{border-radius:20px !important; background:linear-gradient(180deg,#fbfdff 0%,#f5f9fc 100%) !important; border:1px solid #d9e7f0 !important; padding:16px !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.7) !important;}
+        .product-grid{gap:10px !important;}
+        .product-item{border-radius:16px !important; padding:12px !important; background:#fcfdff !important; border:1px solid #dce7ef !important;}
+        .product-item:hover{box-shadow:0 10px 22px rgba(15,23,42,.05) !important; transform:translateY(-1px) !important;}
+        .btn{font-family:'Heebo','Rubik',Arial,sans-serif !important; font-weight:700 !important; border-radius:15px !important; padding:11px 15px !important; background:linear-gradient(135deg,#0a7897 0%,#1b93b0 100%) !important; box-shadow:0 10px 22px rgba(10,120,151,.2) !important;}
+        .btn.secondary{background:#f7fbfe !important; color:#0a7897 !important; border:1px solid #d6e4ee !important; box-shadow:none !important;}
+        .btn:hover{transform:translateY(-1px) !important;}
+        .tabs{background:linear-gradient(180deg,#fbfdff 0%,#f4f8fb 100%) !important; padding:0 10px !important;}
+        .tab{padding:15px 15px !important; font-weight:800 !important;}
+        .tab.active{color:#0a7897 !important; border-bottom-color:#0a7897 !important;}
+        .preview-shell{border-radius:22px !important; border:1px solid #dce7ef !important; overflow:hidden !important;}
+        .slide{padding:28px !important; min-height:500px !important; background:linear-gradient(180deg,#ffffff 0%,#f4fbff 100%) !important;}
+        .slide h2{font-family:'Rubik','Heebo',Arial,sans-serif !important; font-size:1.55rem !important; color:#0a7897 !important;}
+        .badge{border-radius:999px !important; background:#e8f7fb !important; border:1px solid #cee8ef !important; color:#0a7897 !important; padding:6px 11px !important; font-weight:800 !important;}
+        .demo-box,.prompt-block,.sequence{border-radius:18px !important; box-shadow:0 10px 24px rgba(15,23,42,.04) !important;}
+        .demo-box,.prompt-block{background:#fff !important; border:1px solid #dce7ef !important;}
+        .sequence{background:linear-gradient(180deg,#f3fbf6 0%,#eef8f2 100%) !important; border:1px solid #cfe5d7 !important;}
+        .code{border-radius:16px !important; font-size:.92rem !important; line-height:1.6 !important;}
+        #autoGoalTools{display:flex !important; gap:10px !important; flex-wrap:wrap !important; margin-top:10px !important;}
+        #autoGoalTools .btn.secondary{background:#ffffff !important;}
+        #autoGoalNote{background:#eef7fb !important; border:1px solid #d5e7ef !important; border-radius:14px !important; padding:10px 12px !important; margin-top:10px !important; color:#48606f !important;}
+      `;
+
+      const title = doc.querySelector('.header h1');
+      if(title) title.textContent = 'סטודיו לשיעורי שפה — גרסה מתוקנת ומעודכנת';
+      const subtitle = doc.querySelector('.header div');
+      if(subtitle) subtitle.textContent = 'עיצוב בולט ומודרני יותר + מילוי אוטומטי אמין למטרת הלמידה והדגשים הפדגוגיים';
+
+      const gradeEl = doc.getElementById('grade');
+      const domainEl = doc.getElementById('domain');
+      const subskillEl = doc.getElementById('subskill');
+      const stageEl = doc.getElementById('stage');
+      const levelEl = doc.getElementById('level');
+      const goalEl = doc.getElementById('goal');
+      if(!gradeEl || !domainEl || !subskillEl || !stageEl || !levelEl || !goalEl) return;
+
+      const label = goalEl.closest('.section')?.querySelector('.label');
+      if(label) label.textContent = 'מטרת הלמידה והדגשים הפדגוגיים';
+
+      if(!doc.getElementById('autoGoalTools')){
+        const tools = doc.createElement('div');
+        tools.id='autoGoalTools';
+        tools.innerHTML = `
+          <button type="button" class="btn secondary" id="fillAutoGoalBtn">מלא אוטומטית</button>
+          <button type="button" class="btn secondary" id="shortAutoGoalBtn">קצר יותר</button>
+          <button type="button" class="btn secondary" id="longAutoGoalBtn">מפורט יותר</button>
+        `;
+        goalEl.insertAdjacentElement('afterend', tools);
+      }
+      if(!doc.getElementById('autoGoalNote')){
+        const note = doc.createElement('div');
+        note.id='autoGoalNote';
+        note.className='small';
+        note.textContent='השדה מתעדכן אוטומטית לפי התחום, המיומנות, שלב ההוראה, רמת הביצוע ושכבת הגיל. אפשר גם לערוך ידנית.';
+        doc.getElementById('autoGoalTools').insertAdjacentElement('afterend', note);
+      }
+
+      function autoFill(mode='normal'){
+        const data = buildAutoGoalAndFocus({domain:domainEl.value, subskill:subskillEl.value, stage:stageEl.value, level:levelEl.value, grade:gradeEl.value});
+        if(!data) return;
+        let goal = data.goal;
+        let focus = data.focus;
+        if(mode==='short'){
+          goal = data.goal.split('. ').slice(0,2).join('. ');
+          focus = data.focus.split('. ').slice(0,2).join('. ');
+        }
+        if(mode==='long'){
+          goal += ' התוצרים צריכים לשקף באופן ברור את המיומנות, את שלב ההוראה ואת רמת המורכבות שנבחרה.';
+          focus += ' יש להקפיד על הלימה בין סוג התוצר, אופי המשימות, היקף התמיכה ורמת העצמאות הנדרשת מן הלומדים.';
+        }
+        goalEl.value = `מטרת הלמידה: ${goal}\n\nדגשים פדגוגיים: ${focus}`;
+        goalEl.dataset.autofilled = '1';
+        goalEl.dispatchEvent(new Event('input', {bubbles:true}));
+        if(typeof win.renderAll==='function') win.renderAll();
+      }
+
+      const fillBtn = doc.getElementById('fillAutoGoalBtn');
+      const shortBtn = doc.getElementById('shortAutoGoalBtn');
+      const longBtn = doc.getElementById('longAutoGoalBtn');
+      fillBtn.onclick = ()=>autoFill('normal');
+      shortBtn.onclick = ()=>autoFill('short');
+      longBtn.onclick = ()=>autoFill('long');
+
+      const updateIfAuto = ()=>{
+        if(!goalEl.value.trim() || goalEl.dataset.autofilled==='1') autoFill('normal');
+      };
+
+      if(!goalEl.dataset.boundAuto){
+        goalEl.addEventListener('input', ()=>{ if(goalEl.dataset.autofilled==='1') return; goalEl.dataset.autofilled='0'; });
+        [gradeEl, domainEl, subskillEl, stageEl, levelEl].forEach(el=>{ el.addEventListener('change', updateIfAuto); el.addEventListener('input', updateIfAuto); });
+        goalEl.dataset.boundAuto='1';
+      }
+
+      updateIfAuto();
+    }
+
+    function runEnhance(){ try{ enhance(); } catch(e){} }
+    frame.addEventListener('load', ()=>{
+      runEnhance();
+      setTimeout(runEnhance, 250);
+      setTimeout(runEnhance, 900);
+      setTimeout(runEnhance, 1800);
+      setTimeout(runEnhance, 3000);
+    });
+  </script>
+</body>
+</html>
