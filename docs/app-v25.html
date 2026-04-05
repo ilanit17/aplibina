@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — app-v25</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f8fb;--card:#fff;--text:#1f2937;--muted:#667085;--border:#d9e6ef;--accent:#0b7492;--accent2:#2aa7c1;--shadow:0 14px 40px rgba(15,23,42,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Heebo','Rubik',Arial,sans-serif;background:linear-gradient(180deg,#f3f7fb,#eef4f8);color:var(--text)}
+    .header{background:linear-gradient(135deg,var(--accent),#178aa9 55%,var(--accent2));color:#fff;padding:28px 22px;box-shadow:0 16px 40px rgba(11,116,146,.24)}
+    .header h1{margin:0 0 8px;font-size:1.9rem}.header p{margin:0;opacity:.96}
+    .wrap{max-width:1480px;margin:auto;padding:18px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    .panel h2{margin:0 0 8px;color:var(--accent);font-size:1.1rem}
+    .panel p{margin:0 0 12px;color:var(--muted)}
+    .buttons{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{border:none;border-radius:14px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),#1b93b0);color:#fff}
+    .btn.secondary{background:#f7fbfe;color:var(--accent);border:1px solid #d6e4ee}
+    .status{margin-top:10px;color:var(--muted);font-size:.95rem}
+    .frame-card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    iframe{width:100%;height:calc(100vh - 410px);border:none;background:#fff}
+    .textarea{width:100%;min-height:180px;border:1px solid var(--border);border-radius:16px;padding:14px;font:inherit;line-height:1.6;background:#fbfdff;color:var(--text);resize:vertical}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:1000px){.cols{grid-template-columns:1fr}iframe{height:calc(100vh - 520px)}.header h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>סטודיו לשיעורי שפה — v25</h1>
+    <p>גרסה יציבה שמבוססת על v22 התקינה, ומוסיפה כלים ליצירת חבילת קבצים, JSON Schema, הורדת ZIP ושיתוף ב-Netlify Drop.</p>
+  </div>
+  <div class="wrap">
+    <div class="panel">
+      <h2>שיתוף התוצרים ברשת</h2>
+      <p>השתמשי באפליקציה למטה כרגיל. לאחר בחירת התוצרים, אפשר להוריד ZIP, להוריד HTML ראשון, ולפתוח את Netlify Drop.</p>
+      <div class="buttons">
+        <button class="btn secondary" id="refreshStateBtn">רענן נתונים מהאפליקציה</button>
+        <button class="btn primary" id="downloadZipBtn">הורד ZIP לשיתוף</button>
+        <button class="btn secondary" id="downloadFirstBtn">הורד HTML ראשון</button>
+        <button class="btn secondary" id="openNetlifyBtn">פתח Netlify Drop</button>
+      </div>
+      <div class="status" id="status">טוען את האפליקציה…</div>
+    </div>
+
+    <div class="panel">
+      <h2>יצירת חבילת קבצים על ידי מודל שפה</h2>
+      <p>כאן אפשר להעתיק פרומפט מאוחד לחבילת קבצים מלאה, ואת ה־JSON Schema לאימות הפלט שהמודל מחזיר.</p>
+      <div class="buttons" style="margin-bottom:12px">
+        <button class="btn primary" id="buildPackagePromptBtn">בנה פרומפט לחבילת קבצים</button>
+        <button class="btn secondary" id="copyPackagePromptBtn">העתק פרומפט חבילה</button>
+        <button class="btn secondary" id="copySchemaBtn">העתק JSON Schema</button>
+      </div>
+      <div class="cols">
+        <div>
+          <h2 style="font-size:1rem">פרומפט לחבילת קבצים</h2>
+          <textarea class="textarea" id="packagePromptBox" placeholder="הפרומפט המאוחד יופיע כאן"></textarea>
+        </div>
+        <div>
+          <h2 style="font-size:1rem">JSON Schema</h2>
+          <textarea class="textarea" id="schemaBox"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame-card">
+      <iframe id="appFrame" src="./app-v22.html" title="app-v22"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const frame = document.getElementById('appFrame');
+    const statusEl = document.getElementById('status');
+    const packagePromptBox = document.getElementById('packagePromptBox');
+    const schemaBox = document.getElementById('schemaBox');
+    let cachedPrompts = {};
+    let cachedState = null;
+
+    const lessonKitSchema = {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://example.com/lesson-kit.schema.json",
+      "title": "Lesson Kit Package",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_name", "files"],
+      "properties": {
+        "package_name": { "type": "string", "minLength": 1 },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["filename", "file_type", "title", "content"],
+            "properties": {
+              "filename": {
+                "type": "string",
+                "enum": [
+                  "index.html",
+                  "lesson-plan.html",
+                  "lesson-text.html",
+                  "worksheet.html",
+                  "interactive-activity.html",
+                  "slides.html",
+                  "answer-key.html"
+                ]
+              },
+              "file_type": {
+                "type": "string",
+                "enum": [
+                  "index",
+                  "lesson_plan",
+                  "lesson_text",
+                  "worksheet",
+                  "interactive_activity",
+                  "slides",
+                  "answer_key"
+                ]
+              },
+              "title": { "type": "string", "minLength": 1 },
+              "content": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    };
+
+    schemaBox.value = JSON.stringify(lessonKitSchema, null, 2);
+
+    function getFrameWindow(){ return frame.contentWindow; }
+
+    function readStateFromFrame(){
+      const w = getFrameWindow();
+      try {
+        const stateFn = w.eval('state');
+        cachedState = typeof stateFn === 'function' ? stateFn() : null;
+      } catch (e) {
+        cachedState = null;
+      }
+      return cachedState;
+    }
+
+    function readPromptsFromFrame(){
+      const w = getFrameWindow();
+      try {
+        const prompts = w.eval('latestPrompts');
+        cachedPrompts = prompts || {};
+        readStateFromFrame();
+        const keys = Object.keys(cachedPrompts);
+        statusEl.textContent = keys.length ? `זוהו ${keys.length} תוצרים מוכנים.` : 'לא זוהו עדיין תוצרים נבחרים. בחרי תוצרים באפליקציה למטה.';
+        return cachedPrompts;
+      } catch (e) {
+        statusEl.textContent = 'לא הצלחתי לקרוא עדיין את נתוני האפליקציה. נסי שוב לאחר טעינת העמוד.';
+        return {};
+      }
+    }
+
+    function sanitizeFileName(name){
+      return String(name).toLowerCase().replace(/[^a-z0-9\u0590-\u05ff]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'') || 'file';
+    }
+
+    function buildHtmlShell(title, prompt){
+      const safePrompt = String(prompt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title><style>body{font-family:Heebo,Arial,sans-serif;direction:rtl;padding:32px;max-width:900px;margin:auto;background:#f8fbfd;color:#1f2937}.card{background:#fff;border:1px solid #d9e6ef;border-radius:18px;padding:24px;box-shadow:0 8px 24px rgba(15,23,42,.06)}h1{color:#0b7492}pre{white-space:pre-wrap;font:inherit;line-height:1.8}</style></head><body><div class="card"><h1>${title}</h1><pre>${safePrompt}</pre></div></body></html>`;
+    }
+
+    function downloadBlob(filename, blob){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadHtml(filename, html){
+      const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+      downloadBlob(filename, blob);
+    }
+
+    async function downloadZip(){
+      const prompts = readPromptsFromFrame();
+      const entries = Object.entries(prompts);
+      if(!entries.length){ alert('לא זוהו תוצרים לשיתוף.'); return; }
+      const zip = new JSZip();
+      entries.forEach(([title, prompt], index) => {
+        const html = buildHtmlShell(title, prompt);
+        const filename = index === 0 ? 'index.html' : `${sanitizeFileName(title)}.html`;
+        zip.file(filename, html);
+      });
+      const blob = await zip.generateAsync({type:'blob'});
+      downloadBlob('lesson-share-kit.zip', blob);
+    }
+
+    function downloadFirst(){
+      const prompts = readPromptsFromFrame();
+      const entries = Object.entries(prompts);
+      if(!entries.length){ alert('לא זוהו תוצרים לשיתוף.'); return; }
+      const [title, prompt] = entries[0];
+      downloadHtml(`${sanitizeFileName(title)}.html`, buildHtmlShell(title, prompt));
+    }
+
+    function openNetlifyDrop(){
+      window.open('https://app.netlify.com/drop', '_blank', 'noopener,noreferrer');
+    }
+
+    function buildPackagePrompt(){
+      const state = readStateFromFrame();
+      if(!state){
+        packagePromptBox.value = 'לא הצלחתי לקרוא את נתוני האפליקציה. לחצי על "רענן נתונים מהאפליקציה" ונסי שוב.';
+        return;
+      }
+      const selectedProducts = Array.isArray(state.products) ? state.products : [];
+      const prompt = `אתה מחולל תוצרי הוראה מקצועי בעברית עבור שיעורי שפה.\n\nהמטרה שלך:\nלקבל נתוני שיעור, וליצור חבילת קבצי HTML מלאה ומוכנה לשימוש עבור המורה.\n\nחשוב מאוד:\n1. החזר תשובה בפורמט JSON תקין בלבד.\n2. אל תכתוב שום טקסט לפני ה-JSON או אחריו.\n3. אל תשתמש ב-Markdown.\n4. אל תעטוף את התשובה ב-\\\`\\\`\\\`json.\n5. כל קובץ חייב להכיל HTML מלא ועצמאי.\n6. כל קובץ חייב להיות בעברית, בכיוון RTL מלא.\n7. כל קובץ חייב להיות מותאם לגיל התלמידים ולשכבת הגיל.\n8. אם נדרש ניקוד, יש להקפיד על ניקוד תקין ועקבי.\n9. אם תוצר מסוים לא נבחר, אל תחזיר אותו.\n10. כל קובץ צריך להיות מוכן לשמירה מיידית כקובץ .html ללא עיבוד נוסף.\n\nמבנה התשובה הנדרש:\n{\n  "package_name": "lesson-kit",\n  "files": [\n    {\n      "filename": "index.html",\n      "file_type": "index",\n      "title": "דף פתיחה לחבילת התוצרים",\n      "content": "<!doctype html>..."\n    }\n  ]\n}\n\nכללים לשמות קבצים:\n- השתמש רק בשמות קבצים באנגלית\n- ללא רווחים\n- עם מקפים בלבד\n- עם סיומת .html\n- שמות אפשריים:\n  - index.html\n  - lesson-plan.html\n  - lesson-text.html\n  - worksheet.html\n  - interactive-activity.html\n  - slides.html\n  - answer-key.html\n\nדרישות לקובץ index.html:\n- צור דף פתיחה אסתטי ופשוט\n- כלול כותרת החבילה\n- כלול תקציר קצר של השיעור\n- הצג רשימת קישורים לכל שאר הקבצים שנוצרו\n- השתמש בקישורים יחסיים\n\nדרישות לכל קובץ HTML:\n- חייב לכלול HTML מלא\n- חייב להיות lang=he ו-dir=rtl\n- כתוב HTML מלא, לא מקטע\n- עיצוב נקי, קריא, נעים ומודרני\n- גופן מתאים לילדים\n- ריווח טוב\n- כותרות ברורות\n- תמיכה בהדפסה כאשר רלוונטי\n\nדרישות פדגוגיות כלליות:\n- שמור על הלימה מלאה בין כל שדות השיעור\n- אם נבחרו כמה תוצרים, הם חייבים להיות מתואמים זה לזה\n- מערך השיעור למורה חייב להתייחס במפורש לשאר התוצרים\n- דף העבודה והפעילות האינטראקטיבית חייבים להתבסס על אותה מיומנות ואותו נושא\n- מפתח התשובות חייב להתאים בפועל לדף העבודה ולפעילות\n- אם נוצר טקסט מלווה, עליו להתאים לכל שאר התוצרים\n\nכעת צור את החבילה לפי הנתונים הבאים:\n\nכיתת יעד: ${state.gradeLabel || ''}\nתחום לימוד: ${state.domain || ''}\nנושא בתוך התחום: ${state.topic || ''}\nמיומנות ספציפית: ${state.skill || ''}\nמקור המיומנות: ${state.sourceGrade || ''}\nנושא השיעור / נושא הטקסט: ${state.lessonTopic || ''}\nשלב הוראה מרכזי: ${state.stage || ''}\nרמת ביצוע: ${state.level || ''}\nמטרות מבחינת המיומנות: ${state.skillGoal || ''}\nמטרות מבחינת התוכן: ${state.contentGoal || ''}\nדגשים פדגוגיים: ${state.pedagogyGoal || ''}\nמקור התוכן: ${state.sourceMode || ''}\nהנחיות/טקסט מקור: ${state.sourceInstruction || ''}\nרמת ניקוד: ${state.nikudLevel || ''}\nמה לנקד: ${state.nikudScope || ''}\nמספר שאלות בדף עבודה: ${state.worksheetQuestions || ''}\nמספר פריטים בפעילות אינטראקטיבית: ${state.interactiveItems || ''}\nתוצרים נבחרים: ${selectedProducts.join(', ')}\n\nתזכורת אחרונה:\n- החזר JSON תקין בלבד\n- כל קובץ ב-content חייב להיות HTML מלא\n- אין להשמיט את index.html\n- אל תחזיר תוצרים שלא נבחרו\n- התוצרים חייבים להיות עקביים ומתואמים זה עם זה`;
+      packagePromptBox.value = prompt;
+    }
+
+    async function copyText(text){
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(() => {
+        readPromptsFromFrame();
+        buildPackagePrompt();
+      }, 700);
+    });
+
+    document.getElementById('refreshStateBtn').onclick = () => {
+      readPromptsFromFrame();
+      buildPackagePrompt();
+    };
+    document.getElementById('downloadZipBtn').onclick = downloadZip;
+    document.getElementById('downloadFirstBtn').onclick = downloadFirst;
+    document.getElementById('openNetlifyBtn').onclick = openNetlifyDrop;
+    document.getElementById('buildPackagePromptBtn').onclick = buildPackagePrompt;
+    document.getElementById('copyPackagePromptBtn').onclick = async () => {
+      if(!packagePromptBox.value) buildPackagePrompt();
+      const ok = await copyText(packagePromptBox.value);
+      alert(ok ? 'פרומפט החבילה הועתק' : 'לא הצלחתי להעתיק אוטומטית.');
+    };
+    document.getElementById('copySchemaBtn').onclick = async () => {
+      const ok = await copyText(schemaBox.value);
+      alert(ok ? 'JSON Schema הועתק' : 'לא הצלחתי להעתיק אוטומטית.');
+    };
+  </script>
+</body>
+</html>
