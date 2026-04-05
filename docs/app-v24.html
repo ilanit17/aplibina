@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — app-v24</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f8fb;--card:#fff;--text:#1f2937;--muted:#667085;--border:#d9e6ef;--accent:#0b7492;--accent2:#2aa7c1;--shadow:0 14px 40px rgba(15,23,42,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Heebo','Rubik',Arial,sans-serif;background:linear-gradient(180deg,#f3f7fb,#eef4f8);color:var(--text)}
+    .header{background:linear-gradient(135deg,var(--accent),#178aa9 55%,var(--accent2));color:#fff;padding:28px 22px;box-shadow:0 16px 40px rgba(11,116,146,.24)}
+    .header h1{margin:0 0 8px;font-size:1.9rem}.header p{margin:0;opacity:.96}
+    .wrap{max-width:1480px;margin:auto;padding:18px}
+    .toolbar{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    .toolbar h2{margin:0 0 8px;color:var(--accent);font-size:1.1rem}
+    .toolbar p{margin:0 0 12px;color:var(--muted)}
+    .buttons{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{border:none;border-radius:14px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),#1b93b0);color:#fff}
+    .btn.secondary{background:#f7fbfe;color:var(--accent);border:1px solid #d6e4ee}
+    .status{margin-top:10px;color:var(--muted);font-size:.95rem}
+    .frame-card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    iframe{width:100%;height:calc(100vh - 230px);border:none;background:#fff}
+    @media(max-width:900px){iframe{height:calc(100vh - 280px)}.header h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>סטודיו לשיעורי שפה — גרסה יציבה עם שיתוף</h1>
+    <p>גרסה זו טוענת את v22 התקינה ומוסיפה מעליה כלי הורדה ושיתוף ל-Netlify Drop.</p>
+  </div>
+  <div class="wrap">
+    <div class="toolbar">
+      <h2>שיתוף התוצרים ברשת</h2>
+      <p>השתמשי באפליקציה למטה כרגיל. לאחר בחירת התוצרים, אפשר להוריד HTML בודד, להוריד ZIP של כל התוצרים, ולפתוח את Netlify Drop.</p>
+      <div class="buttons">
+        <button class="btn secondary" id="refreshStateBtn">רענן תוצרים מהאפליקציה</button>
+        <button class="btn primary" id="downloadZipBtn">הורד ZIP לשיתוף</button>
+        <button class="btn secondary" id="downloadFirstBtn">הורד HTML ראשון</button>
+        <button class="btn secondary" id="openNetlifyBtn">פתח Netlify Drop</button>
+      </div>
+      <div class="status" id="status">טוען את האפליקציה…</div>
+    </div>
+    <div class="frame-card">
+      <iframe id="appFrame" src="./app-v22.html" title="app-v22"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const frame = document.getElementById('appFrame');
+    const statusEl = document.getElementById('status');
+    let cachedPrompts = {};
+
+    function getFrameWindow(){ return frame.contentWindow; }
+
+    function readPromptsFromFrame(){
+      const w = getFrameWindow();
+      try {
+        const prompts = w.eval('latestPrompts');
+        cachedPrompts = prompts || {};
+        const keys = Object.keys(cachedPrompts);
+        statusEl.textContent = keys.length ? `זוהו ${keys.length} תוצרים מוכנים לשיתוף.` : 'לא זוהו עדיין תוצרים נבחרים. בחרי תוצרים באפליקציה למטה.';
+        return cachedPrompts;
+      } catch (e) {
+        statusEl.textContent = 'לא הצלחתי לקרוא עדיין את התוצרים מהאפליקציה. נסי שוב לאחר טעינת העמוד.';
+        return {};
+      }
+    }
+
+    function sanitizeFileName(name){
+      return String(name).toLowerCase().replace(/[^a-z0-9\u0590-\u05ff]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'') || 'file';
+    }
+
+    function buildHtmlShell(title, prompt){
+      const safePrompt = String(prompt)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;');
+      return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title><style>body{font-family:Heebo,Arial,sans-serif;direction:rtl;padding:32px;max-width:900px;margin:auto;background:#f8fbfd;color:#1f2937}.card{background:#fff;border:1px solid #d9e6ef;border-radius:18px;padding:24px;box-shadow:0 8px 24px rgba(15,23,42,.06)}h1{color:#0b7492}pre{white-space:pre-wrap;font:inherit;line-height:1.8}</style></head><body><div class="card"><h1>${title}</h1><pre>${safePrompt}</pre></div></body></html>`;
+    }
+
+    function downloadBlob(filename, blob){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadHtml(filename, html){
+      const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+      downloadBlob(filename, blob);
+    }
+
+    async function downloadZip(){
+      const prompts = readPromptsFromFrame();
+      const entries = Object.entries(prompts);
+      if(!entries.length){ alert('לא זוהו תוצרים לשיתוף.'); return; }
+      const zip = new JSZip();
+      entries.forEach(([title, prompt], index) => {
+        const html = buildHtmlShell(title, prompt);
+        const filename = index === 0 ? 'index.html' : `${sanitizeFileName(title)}.html`;
+        zip.file(filename, html);
+      });
+      const blob = await zip.generateAsync({type:'blob'});
+      downloadBlob('lesson-share-kit.zip', blob);
+    }
+
+    function downloadFirst(){
+      const prompts = readPromptsFromFrame();
+      const entries = Object.entries(prompts);
+      if(!entries.length){ alert('לא זוהו תוצרים לשיתוף.'); return; }
+      const [title, prompt] = entries[0];
+      downloadHtml(`${sanitizeFileName(title)}.html`, buildHtmlShell(title, prompt));
+    }
+
+    function openNetlifyDrop(){
+      window.open('https://app.netlify.com/drop', '_blank', 'noopener,noreferrer');
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(readPromptsFromFrame, 600);
+    });
+
+    document.getElementById('refreshStateBtn').onclick = readPromptsFromFrame;
+    document.getElementById('downloadZipBtn').onclick = downloadZip;
+    document.getElementById('downloadFirstBtn').onclick = downloadFirst;
+    document.getElementById('openNetlifyBtn').onclick = openNetlifyDrop;
+  </script>
+</body>
+</html>
