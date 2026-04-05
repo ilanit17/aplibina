@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — language-studio v26</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f8fb;--card:#fff;--text:#1f2937;--muted:#667085;--border:#d9e6ef;--accent:#0b7492;--accent2:#2aa7c1;--shadow:0 14px 40px rgba(15,23,42,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Heebo','Rubik',Arial,sans-serif;background:linear-gradient(180deg,#f3f7fb,#eef4f8);color:var(--text)}
+    .header{background:linear-gradient(135deg,var(--accent),#178aa9 55%,var(--accent2));color:#fff;padding:26px 22px;box-shadow:0 16px 40px rgba(11,116,146,.24)}
+    .header h1{margin:0 0 8px;font-size:1.8rem}.header p{margin:0;opacity:.96}
+    .wrap{max-width:1480px;margin:auto;padding:18px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    .panel h2{margin:0 0 8px;color:var(--accent);font-size:1.1rem}
+    .panel p{margin:0 0 12px;color:var(--muted)}
+    .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .select{padding:11px 14px;border-radius:14px;border:1px solid #d7e3ec;background:#fbfdff;font:inherit;color:inherit;min-width:250px}
+    .btn{border:none;border-radius:14px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+    .btn.secondary{background:#f7fbfe;color:var(--accent);border:1px solid #d6e4ee}
+    .status{margin-top:10px;color:var(--muted);font-size:.95rem}
+    .frame-card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    iframe{width:100%;height:calc(100vh - 245px);border:none;background:#fff}
+    @media(max-width:900px){iframe{height:calc(100vh - 300px)}.header h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>סטודיו לשיעורי שפה</h1>
+    <p>גרסה זו מבוססת על v22, עם בחירה ייעודית בין דף עבודה להדפסה לבין דף עבודה אינטראקטיבי.</p>
+  </div>
+  <div class="wrap">
+    <div class="panel">
+      <h2>סוג דף העבודה</h2>
+      <p>הבחירה כאן מעדכנת אוטומטית את פרומפט דף העבודה בתוך האפליקציה למטה.</p>
+      <div class="controls">
+        <select id="worksheetMode" class="select">
+          <option value="print">דף עבודה להדפסה</option>
+          <option value="interactive">דף עבודה אינטראקטיבי</option>
+        </select>
+        <button class="btn secondary" id="applyBtn">החל על הפרומפטים</button>
+      </div>
+      <div class="status" id="status">טוען את האפליקציה…</div>
+    </div>
+    <div class="frame-card">
+      <iframe id="appFrame" src="./app-v22.html" title="app-v22"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const frame = document.getElementById('appFrame');
+    const statusEl = document.getElementById('status');
+    const modeEl = document.getElementById('worksheetMode');
+    let patched = false;
+
+    function patchWorksheetPrompt() {
+      const w = frame.contentWindow;
+      if (!w) return;
+      try {
+        if (!w.__originalBuildPrompts) {
+          w.__originalBuildPrompts = w.buildPrompts;
+        }
+        w.buildPrompts = function(s) {
+          const prompts = w.__originalBuildPrompts(s);
+          if (prompts['דף עבודה לתרגול']) {
+            if (modeEl.value === 'print') {
+              prompts['דף עבודה לתרגול'] += '\n\nחשוב: דף העבודה צריך להיות מיועד בראש ובראשונה להדפסה. עצב אותו כעמוד עבודה מודפס, עם ריווח ברור לכתיבה ידנית, שוליים נוחים, חלוקה ברורה בין שאלות, וללא תלות בפעולות אינטראקטיביות דיגיטליות. אפשר לאפשר גם עבודה על מסך, אך הדגש המרכזי הוא תוצר ידידותי להדפסה.';
+            } else {
+              prompts['דף עבודה לתרגול'] += '\n\nחשוב: דף העבודה צריך להיות אינטראקטיבי. צור קובץ HTML שמאפשר לתלמידים לענות ישירות על המסך, עם שדות קלט, כפתורי בדיקה או משוב, וחוויית שימוש דיגיטלית ברורה. אפשרות הדפסה אינה המרכז; הדגש הוא עבודה אינטראקטיבית במחשב או בטאבלט.';
+            }
+          }
+          return prompts;
+        };
+        if (typeof w.renderAll === 'function') {
+          w.renderAll();
+        }
+        patched = true;
+        statusEl.textContent = modeEl.value === 'print'
+          ? 'הוחל מצב: דף עבודה להדפסה.'
+          : 'הוחל מצב: דף עבודה אינטראקטיבי.';
+      } catch (e) {
+        statusEl.textContent = 'לא הצלחתי עדיין להחיל את הבחירה. נסי שוב לאחר טעינת האפליקציה.';
+      }
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(() => {
+        patchWorksheetPrompt();
+      }, 700);
+    });
+
+    document.getElementById('applyBtn').onclick = patchWorksheetPrompt;
+    modeEl.addEventListener('change', () => {
+      if (patched) patchWorksheetPrompt();
+    });
+  </script>
+</body>
+</html>
