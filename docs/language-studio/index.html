@@ -3,112 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>סטודיו לשיעורי שפה — app-v27</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>סטודיו לשיעורי שפה — app-v29</title>
   <style>
-    :root{--bg:#f3f7fb;--bg2:#eef4f8;--card:#fff;--text:#1f2937;--muted:#667085;--border:#d9e6ef;--accent:#0b7492;--accent2:#2aa7c1;--accent-soft:#e8f7fb;--shadow:0 14px 40px rgba(15,23,42,.08);--sel:#ecfbf4;--sel-b:#9ad2b2}
-    *{box-sizing:border-box} body{margin:0;font-family:'Heebo','Rubik',Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
-    .header{background:linear-gradient(135deg,var(--accent),#178aa9 55%,var(--accent2));color:#fff;padding:42px 24px;box-shadow:0 16px 40px rgba(11,116,146,.24)}
-    .header-inner{max-width:1460px;margin:auto}.header h1{margin:0 0 10px;font-family:'Rubik','Heebo',sans-serif;font-size:2.1rem}.header p{margin:0;opacity:.96;font-size:1.02rem}
-    .wrap{max-width:1460px;margin:auto;padding:24px 18px 40px}.grid{display:grid;grid-template-columns:minmax(460px,640px) 1fr;gap:24px;align-items:start}
-    .card{background:#fff;border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow)}.form{padding:22px}.preview{overflow:hidden;position:sticky;top:16px}
-    .section{margin-bottom:18px}.label{display:block;font-weight:800;margin-bottom:8px}.small{font-size:.92rem;color:var(--muted);line-height:1.55}
-    .select,.textarea,.input{width:100%;padding:13px 15px;border-radius:16px;border:1px solid #d7e3ec;background:#fbfdff;font:inherit;color:inherit}.textarea{min-height:112px;resize:vertical}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.box{background:linear-gradient(180deg,#fbfdff,#f5f9fc);border:1px solid #d9e7f0;border-radius:18px;padding:14px}.box h3{margin:0 0 8px;color:var(--accent);font-size:1rem}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap}.btn{border:none;border-radius:14px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}.btn.secondary{background:#f7fbfe;color:var(--accent);border:1px solid #d6e4ee}
-    .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 10px;background:linear-gradient(180deg,#fbfdff,#f4f8fb)}.tab{background:none;border:none;padding:14px;font:inherit;font-weight:800;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}.panel{padding:22px}
-    .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);border:1px solid #cee8ef;padding:6px 11px;border-radius:999px;font-weight:800;font-size:.85rem;margin-left:6px;margin-bottom:8px}
-    .demo,.prompt,.seq{background:#fff;border:1px solid #dce7ef;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 8px 20px rgba(15,23,42,.04)}.seq{background:linear-gradient(180deg,#f3fbf6,#eef8f2);border-color:#cfe5d7;color:#20543b}
-    .code{white-space:pre-wrap;background:#111827;color:#e5eef7;padding:16px;border-radius:14px;font-family:Consolas,monospace;font-size:.9rem;line-height:1.6;direction:ltr;text-align:left}
-    .prompt-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.prompt-head h3{margin:0;color:var(--accent)}
-    .callout{background:#eef7fb;border:1px solid #d5e7ef;border-radius:14px;padding:10px 12px;color:#48606f;margin-top:10px}.hidden{display:none!important}
-    .products{display:grid;grid-template-columns:1fr 1fr;gap:10px}.product-item{display:flex;gap:10px;align-items:flex-start;background:#fcfdff;border:1px solid #dce7ef;border-radius:16px;padding:12px}
-    .skill-groups{display:flex;flex-direction:column;gap:12px}.skill-group{border:1px solid #dbe8ef;background:#fbfdff;border-radius:16px;padding:12px}.skill-group h4{margin:0 0 10px;color:#214257}
-    .skill-options{display:flex;flex-wrap:wrap;gap:8px}.skill-chip{appearance:none;border:1px solid #cfe0ea;background:#fff;border-radius:999px;padding:9px 12px;font:inherit;cursor:pointer;transition:.15s}.skill-chip.active{background:var(--sel);border-color:var(--sel-b);color:#164d2f;font-weight:700}
-    .muted-block{padding:12px;border:1px dashed #cfdde7;border-radius:14px;color:var(--muted);background:#fbfdff} input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);transform:scale(1.05)}
-    @media(max-width:980px){.grid,.row,.products{grid-template-columns:1fr}.preview{position:static}.header h1{font-size:1.6rem}}
+    html,body{margin:0;height:100%;background:#eef4f8}
+    iframe{width:100%;height:100%;border:none;display:block;background:#fff}
   </style>
 </head>
 <body>
-  <div class="header"><div class="header-inner"><h1>סטודיו לשיעורי שפה — מחולל פרומפטים</h1><p>אפליקציה סטטית לבניית פרומפטים מדויקים, עם אפשרות למיומנות מותאמת אישית, הפרדה בין מטרות מיומנות למטרות תוכן, ובחירה בתוך האפליקציה בין דף עבודה להדפסה לבין דף עבודה אינטראקטיבי.</p></div></div>
-  <div class="wrap"><div class="grid">
-    <div class="card form">
-      <div class="row section">
-        <div><label class="label">כיתת יעד</label><select id="grade" class="select"></select></div>
-        <div><label class="label">תחום לימוד</label><select id="domain" class="select"></select></div>
-      </div>
-      <div class="section"><label class="label">נושא בתוך התחום</label><select id="topic" class="select"></select><div class="small" style="margin-top:6px">בחרי את הנושא המרכזי שבתוכו תרצי לאתר מיומנות ספציפית.</div></div>
-      <div class="section"><label class="label">מיומנות ספציפית (כולל כיתות קודמות)</label><div id="skillGroups" class="skill-groups"></div><div class="small" style="margin-top:8px">מוצגות כאן מיומנויות מן הכיתה שנבחרה וגם מכיתות קודמות.</div></div>
-      <div class="section"><label class="label">אחר — מיומנות מותאמת אישית</label><input id="customSkill" class="input" placeholder="למשל: זיהוי טענה ונימוק בטקסט קצר"><div class="small" style="margin-top:6px">אם תמלאי כאן, המיומנות שכתבת תגבר על הבחירה מן הרשימה.</div></div>
-      <div class="section box" id="skillInfo"></div>
-      <div class="section"><label class="label">נושא השיעור / נושא הטקסט</label><input id="lessonTopic" class="input" placeholder="למשל: גשם ראשון, חברות, חיות בר בישראל"><div class="small" style="margin-top:6px">נושא התוכן קובע על מה עובדים בשיעור ובטקסטים.</div></div>
-      <div class="row section"><div><label class="label">שלב הוראה</label><select id="stage" class="select"><option>חשיפה / פתיחה</option><option selected>הקניה מפורשת</option><option>תרגול מונחה</option><option>תרגול עצמאי</option><option>העמקה</option><option>הערכה</option><option>חזרה / ביסוס</option></select></div><div><label class="label">רמת ביצוע מבוקשת</label><select id="level" class="select"><option>בסיסית — זיהוי / איתור / תשובה קצרה</option><option selected>בינונית — הסבר / ארגון / נימוק</option><option>מתקדמת — הסקה / ביסוס / השוואה</option><option>מעמיקה — הערכה / העברה / יצירה</option></select></div></div>
-      <div class="section box" id="stageInfo"></div>
-      <div class="row section"><div><label class="label">רמת ניקוד בתוצרים</label><select id="nikudLevel" class="select"><option value="auto">אוטומטי לפי שכבת גיל</option><option value="full">ניקוד מלא</option><option value="partial">ניקוד חלקי</option><option value="none">ללא ניקוד</option></select></div><div><label class="label">מה לנקד</label><select id="nikudScope" class="select"><option value="all">את כל התוצר</option><option value="instructions_keywords">הוראות ומילים חדשות</option><option value="instructions_only">רק הוראות</option></select></div></div>
-      <div class="callout" id="nikudNote">בכיתות ב׳–ג׳ ברירת המחדל היא ניקוד מלא לכל התוצרים.</div>
-      <div class="section"><label class="label">מטרות מבחינת המיומנות</label><textarea id="skillGoal" class="textarea"></textarea></div>
-      <div class="section"><label class="label">מטרות מבחינת תוכן השיעור / נושא הטקסט</label><textarea id="contentGoal" class="textarea"></textarea></div>
-      <div class="section"><label class="label">דגשים פדגוגיים</label><textarea id="pedagogyGoal" class="textarea"></textarea><div class="toolbar" style="margin-top:10px"><button class="btn secondary" id="fillBtn" type="button">מלא אוטומטית</button><button class="btn secondary" id="shortBtn" type="button">קצר יותר</button><button class="btn secondary" id="longBtn" type="button">מפורט יותר</button></div></div>
-      <div class="section"><label class="label">מקור הטקסט</label><div class="products"><label class="product-item"><input type="radio" name="sourceMode" value="manual" checked> הדבקת טקסט</label><label class="product-item"><input type="radio" name="sourceMode" value="upload"> העלאת קובץ</label><label class="product-item"><input type="radio" name="sourceMode" value="ai"> יצירת טקסט על ידי הבינה</label><label class="product-item"><input type="radio" name="sourceMode" value="improve"> שיפור טקסט על ידי הבינה</label></div></div>
-      <div id="manualBox" class="section"><label class="label">טקסט בסיס</label><textarea id="source" class="textarea">יואב ראה שהשמיים התקדרו. הוא סגר במהירות את החלון, אסף את הכביסה מהחבל ורץ לקרוא לאחותו פנימה.</textarea></div>
-      <div id="uploadBox" class="section hidden"><label class="label">העלאת קובץ טקסט</label><input id="fileInput" class="input" type="file" accept=".txt,.md,.csv,.html,.json"><div id="fileStatus" class="callout hidden"></div><label class="label" style="margin-top:10px">הנחיות לקובץ</label><textarea id="uploadInstructions" class="textarea" placeholder="למשל: השתמש רק בפסקה הראשונה"></textarea></div>
-      <div id="aiBox" class="section hidden"><div class="row"><div><label class="label">סוג הטקסט</label><select id="aiTextType" class="select"><option>סיפור קצר</option><option>טקסט מידע</option><option>טקסט טיעון</option><option>דיאלוג</option><option>שיר קצר</option></select></div><div><label class="label">אורך</label><select id="aiLength" class="select"><option>קצר</option><option selected>בינוני</option><option>ארוך</option></select></div></div><div class="row section"><div><label class="label">נושא הטקסט</label><input id="aiTopic" class="input" value="גשם ראשון"></div><div><label class="label">רמת שפה</label><select id="aiLanguageLevel" class="select"><option>פשוטה מאוד</option><option selected>פשוטה</option><option>בינונית</option><option>עשירה</option></select></div></div><div class="section"><label class="label">מילות מפתח</label><input id="aiKeywords" class="input" value="שמיים, חלון, כביסה, רמז"></div></div>
-      <div id="improveBox" class="section hidden"><label class="label">טקסט לשיפור</label><textarea id="improveText" class="textarea">הדביקי כאן טקסט קיים שהבינה תשפר, תפשט, תקצר או תנקד לפי הצורך.</textarea><label class="label" style="margin-top:10px">מה לעשות עם הטקסט?</label><select id="improveAction" class="select"><option>לפשט שפה</option><option>לקצר</option><option>להרחיב</option><option>להוסיף ניקוד</option><option>לשפר ניסוח ואז לבנות תוצרים</option></select></div>
-      <div class="row section"><div><label class="label">סוג דף העבודה</label><select id="worksheetMode" class="select"><option value="print">דף עבודה להדפסה</option><option value="interactive">דף עבודה אינטראקטיבי</option></select><div class="small" style="margin-top:6px">הבחירה הזו משפיעה על פרומפט דף העבודה עצמו.</div></div><div><label class="label">מספר שאלות בדף עבודה</label><select id="worksheetQuestions" class="select"><option>3</option><option selected>5</option><option>7</option><option>10</option></select></div></div>
-      <div class="row section"><div><label class="label">מספר פריטים אינטראקטיביים</label><select id="interactiveItems" class="select"><option>4</option><option selected>6</option><option>8</option><option>10</option></select></div><div></div></div>
-      <div class="section"><label class="label">תוצרים</label><div class="products"><label class="product-item"><input type="checkbox" data-product="מערך שיעור למורה" checked> מערך שיעור למורה</label><label class="product-item"><input type="checkbox" data-product="קובץ טקסט מלווה לשיעור"> קובץ טקסט מלווה לשיעור</label><label class="product-item"><input type="checkbox" data-product="דף עבודה לתרגול" checked> דף עבודה</label><label class="product-item"><input type="checkbox" data-product="פעילות אינטראקטיבית" checked> פעילות אינטראקטיבית</label><label class="product-item"><input type="checkbox" data-product="מצגת להקניה"> מצגת</label><label class="product-item"><input type="checkbox" data-product="מפתח תשובות" checked> מפתח תשובות</label></div></div>
-    </div>
-    <div class="card preview"><div class="tabs"><button class="tab active" data-tab="preview">תצוגה מקדימה</button><button class="tab" data-tab="prompts">פרומפטים</button></div><div class="panel" id="panel"></div></div>
-  </div></div>
+  <iframe id="appFrame" src="../app-v27.html" title="app-v27"></iframe>
   <script>
-    const curriculum={"ב":{"הבנת הנקרא":{"איתור מידע":["איתור מידע גלוי בטקסט","זיהוי הנושא הכללי של הטקסט"],"הבנה ופרשנות":["זיהוי רצף אירועים כרונולוגי","הבנת מילים מתוך ההקשר","מענה על שאלות בממדי ההבנה"],"מבנה הטקסט":["זיהוי כותרת והקשר לטקסט"],"הערכה וביקורת":["קישור לידע העולם"]},"הבעה בכתב":{"סוגות כתיבה":["כתיבת ברכה אישית","כתיבת הזמנה לאירוע","כתיבת סיפור על חוויה אישית","כתיבת פתק או רשימה"],"תהליכי כתיבה":["כתיבת תשובה לשאלה"]},"לשון":{"מערכת השם":["הבחנה בין זכר לנקבה","הבחנה בין יחיד לרבים"],"תחביר ופיסוק":["שימוש בסימני פיסוק (נקודה, סימן שאלה)"],"אוצר מילים":["שורשים ומשפחות מילים","סדר הא\"ב חיצוני ופנימי"]},"ספרות":{"יסודות השיר":["זיהוי חריזה בשיר","הבחנה בין בתים בשיר"],"יסודות הסיפור":["זיהוי דמויות בסיפור","הבנת הסדר הכרונולוגי בסיפור"]}},"ג":{"הבנת הנקרא":{"איתור מידע":["זיהוי רכיבי מבנה בולטים בטקסט"],"הבנה ופרשנות":["זיהוי הרעיון המרכזי של הפסקה","הסקת מסקנות מתוך הטקסט","השוואה בין דמויות או מצבים","זיהוי קשרים לוגיים (סיבה ותוצאה)"]},"הבעה בכתב":{"סוגות כתיבה":["כתיבת קטע ביומן אישי","כתיבת מכתב אישי לחבר","כתיבת הוראות הפעלה פשוטות","כתיבת סיפור עלילה"],"תהליכי כתיבה":["כתיבת רפלקציה על למידה"]},"לשון":{"אוצר מילים":["שימוש במילון (סדר א\"ב)","ניבים ופתגמים בסיסיים"],"תחביר ופיסוק":["שימוש נכון במילות יחס","ה\"א הידיעה ו-ו\"ו החיבור"],"מערכת השם":["התאמה במין ובמספר"]},"ספרות":{"אפיון דמויות":["אפיון דמויות (חיצוני ופנימי)","זיהוי קול המספר לעומת קול הדמויות","הבנת רגשות הדמויות ביצירה"],"יסודות השיר":["זיהוי מאפיינים בולטים בשירים"]}},"ד":{"הבנת הנקרא":{"הערכת מידע":["הבחנה בין עובדה לדעה","הערכת אמינות של מקור מידע"],"השוואת מקורות":["דליית מידע משני מקורות והשוואתם"],"מבנה הטקסט":["זיהוי טענה ונימוק בטקסט","מציאת מידע באמצעות מאפייני טקסט"]},"הבעה בכתב":{"סוגות כתיבה":["כתיבת מכתב רשמי","כתיבת פרסומת או כרזה","כתיבת עלילון (קומיקס)","תיאור והסבר של תופעות"],"כתיבת טיעון":["כתיבת פסקת טיעון (טענה ונימוק)"]},"לשון":{"מערכת הפועל":["זיהוי שבעת בנייני הפועל"],"תחביר":["זיהוי נושא ונשוא במשפט","מילות קישור (ניגוד, זמן, סיבה)"],"אוצר מילים":["מילים נרדפות ומילים ניגודיות","סיומות ותחיליות במילים"]},"ספרות":{"לשון ציורית":["הבנת מטאפורות ודימויים"],"הבנה ופרשנות":["גילוי משמעויות סמויות בטקסט","הבחנה בין מציאות לדמיון (משלים)","הבנת קשרים של רצף זמנים וסיבתיות"]}},"ה":{"הבנת הנקרא":{"הערכת מידע":["הבחנה בין פרטים חשובים לטפלים","הערכת אמינות ומהימנות המידע"],"מיזוג מידע":["דליית מידע ממספר מקורות מידע"],"הבנה ופרשנות":["זיהוי יחסים לוגיים מורכבים בטקסט","הבנת מטרת הטקסט וקהל היעד"]},"הבעה בכתב":{"סוגות כתיבה":["כתיבת סיכום ממקור מידע אחד","כתיבת עבודת חקר קצרה","כתיבת עצומה","כתיבת ידיעה עיתונאית"],"תהליכי כתיבה":["דיווח על תהליכי למידה וחקירה"]},"לשון":{"מערכת השם":["סמיכות בלשון זכר ונקבה","שם הפועל ושם פעולה","כינוי קניין - צורות חבורות ופרודות"],"מערכת הפועל":["צורת הפעיל וצורת הסביל"],"אוצר מילים":["מטבעות לשון שכיחות"]},"ספרות":{"אפיון דמויות":["אפיון דמות מורכבת","הבחנה בין מספר בגוף ראשון ל'כל יודע'"],"לשון ציורית":["הבנת לשון ציורית ותרומתה ליצירה"],"הבנה ופרשנות":["הבחנה בין יסודות בדויים לעובדות"]}},"ו":{"הבנת הנקרא":{"הערכת מידע":["הערכת מהימנות ואיכות המידע","זיהוי עמדת הכותב וביסוסה"],"מיזוג מידע":["מיזוג מידע ממספר מקורות"],"הבנה ופרשנות":["התמודדות עם קונפליקטים בין רעיונות"]},"הבעה בכתב":{"כתיבת טיעון":["כתיבת עמדה בנושא שנוי במחלוקת"],"סוגות כתיבה":["כתיבת מכתב בקשה","כתיבת כתבה עיתונאית מורחבת"],"תהליכי כתיבה":["רפלקציה על תהליך כתיבה"]},"לשון":{"מערכת הפועל":["שבעת בנייני הפועל - זיהוי ושימוש"],"תחביר":["נושא ונשוא - הרחבה","מילות קישור והכרת תפקידיהן"],"אוצר מילים":["ניבים ופתגמים מתקדמים"]},"ספרות":{"מסרים וערכים":["הבעת עמדה ביקורתית על תפיסות חברתיות","זיהוי מסרים וערכים ביצירה"],"לשון ציורית":["הבנת הקשר בין השיר למשמעותו","הבחנה בשימוש ייחודי במילים בשירה"]}},"ז":{"הבנת הנקרא":{"סיכום ומיזוג":["פעולות סיכום ומיזוג מידע"],"מבנה הטקסט":["זיהוי נסיבות השיח בטקסט עיוני","הבנת מבנים לוגיים-רטוריים שקופים"],"הפקת מידע":["הפקת מידע מכותרות וכותרות משנה","אחזור מידע מטבלאות ותרשימים"]},"הבעה בכתב":{"כתיבת טיעון":["כתיבת עמדה מנומקת ומבוססת"],"כתיבה משווה":["כתיבת השוואה בין שני מקורות"],"תהליכי כתיבה":["תכנון וכתיבת תשובה מורחבת","כתיבת כתבה לעיתון או יומן רשת"]},"לשון":{"מבנה המילה":["מבנה המילה: שורש ותבנית","חלקי הדיבור ומערכת הפועל"],"תחביר":["צירופים שמניים והבחנה ממשפט","היחסים הלוגיים ומילות הקישור"],"פיסוק":["תפקידי סימני הפיסוק"]},"ספרות":{"הבנה ופרשנות":["אסטרטגיות לטיפול במילים לא מובנות","הבנת משמעויות של מילים בהקשר","התאמת הגדרה מילונית להקשר"],"אוצר מילים":["שימוש במאגרי מידע מקוונים"]}},"ח":{"הבנת הנקרא":{"טקסט טיעון":["זיהוי רכיבי מבנה בטקסט טיעון","ניסוח טענה וטענות נגד"],"הבנה ופרשנות":["אחזור מידע בטבלה וניסוח תבחינים","הבנת טקסטים למטרות שכנוע","ניתוח מאמרי דעה ושכנוע מורכבים"]},"הבעה בכתב":{"כתיבה ממזגת":["כתיבה ממזגת על בסיס שני מקורות"],"כתיבת טיעון":["כתיבת עמדה מנומקת בזיקה לטקסטים"],"כתיבה רשמית":["כתיבת מכתב ודוא\"ל רשמיים","כתיבת תגובה למערכת"]},"לשון":{"מערכת הפועל":["מערכת הפועל בגזרת השלמים","משמעויות הפועל: פעיל וסביל"],"תחביר":["גרעיני המשפט הפועלי: נושא ונשוא","המרה ממשפט פעיל לסביל ולהפך","התאם תחבירי במשפט"]},"אוצר מילים":{"מבנה ההגדרה":["מבנה ההגדרה המילונית","הגדרה על דרך ההכללה וההבחנה","פרטים דקדוקיים במילון"],"יחסי מילים":["יחסי מילים: נרדפות, ניגודיות והיכללות"]}},"ט":{"הבנת הנקרא":{"מיזוג מידע":["מיזוג מידע ממקורות טקסטואליים שונים","התמודדות עם קונפליקטים בין רעיונות"],"הערכת מידע":["הערכת מהימנות ואיכות המידע"],"הפקת מידע":["אחזור מידע בטבלה - השוואה מורכבת","ניתוח ומיפוי תרשימי זרימה"]},"הבעה בכתב":{"רצפי כתיבה":["כתיבה ברצף כרונולוגי","כתיבה ברצף סיבה ותוצאה","כתיבה ברצף בעיה ופתרונה","כתיבה ברצף תופעה, גורמיה והשפעותיה"],"כתיבה משווה":["כתיבת השוואה מורכבת"]},"לשון":{"מערכת הצורות":["מערכת הצורות בגזרת השלמים","תצורה מסורגת לעומת תצורה קווית","משמעויות משקלים וצורנים סופיים"],"תחביר":["סוגי משפטים: פשוט, איחוי ומורכב"],"פיסוק":["פיסוק תקין ומורכב"]},"אוצר מילים":{"אוצר מילים בהקשר":["חזרה והעמקה בנושאי לשון ותחביר","שימוש מושכל באוצר מילים בהקשר"],"ניתוח משמעות":["ניתוח משמעויות דקות של מילים"]}}};
-    const topicOrder={"הבנת הנקרא":["איתור מידע","הפקת מידע","הבנה ופרשנות","מבנה הטקסט","השוואת מקורות","מיזוג מידע","הערכת מידע","טקסט טיעון","סיכום ומיזוג","הערכה וביקורת"],"הבעה בכתב":["סוגות כתיבה","תהליכי כתיבה","כתיבת טיעון","כתיבה ממזגת","כתיבה רשמית","כתיבה משווה","רצפי כתיבה"],"לשון":["מערכת השם","מערכת הפועל","תחביר","תחביר ופיסוק","מבנה המילה","פיסוק","מערכת הצורות","אוצר מילים"],"ספרות":["יסודות הסיפור","יסודות השיר","אפיון דמויות","לשון ציורית","הבנה ופרשנות","מסרים וערכים","אוצר מילים"],"אוצר מילים":["אוצר מילים","מבנה ההגדרה","יחסי מילים","אוצר מילים בהקשר","ניתוח משמעות"]};
-    const stageData={"חשיפה / פתיחה": {goal:"היכרות ראשונית עם המיומנות ועוררות חשיבה לקראתה.",focus:"יש ליצור פתיחה מסקרנת, לחבר לידע קודם ולהימנע מהעמסת הסבר מלא."},"הקניה מפורשת": {goal:"הבנה ברורה של המיומנות ושל אופן השימוש בה.",focus:"יש לכלול הסבר ישיר, פירוק לשלבים, הדגמה ודוגמה."},"תרגול מונחה": {goal:"התנסות ראשונית במיומנות בעזרת תמיכה והכוונה.",focus:"יש לשלב רמזים, שאלות עזר ותמיכות מדורגות."},"תרגול עצמאי": {goal:"יישום עצמאי של המיומנות.",focus:"יש להפחית תמיכות ולשמור על הוראות ברורות."},"העמקה": {goal:"הרחבה והעמקה של השימוש במיומנות.",focus:"יש לשלב ניתוח, השוואה, ביסוס או העברה."},"הערכה": {goal:"הפגנת שליטה במיומנות במשימות מותאמות.",focus:"יש לצמצם רמזים ולבנות משימות בדיקה מדויקות."},"חזרה / ביסוס": {goal:"רענון וחיזוק מיומנות שנלמדה.",focus:"יש לכלול תרגול ממוקד ולא עמוס."}};
-    const levelData={"בסיסית — זיהוי / איתור / תשובה קצרה": {goal:"ברמת זיהוי, איתור או מענה קצר.",focus:"יש לשמור על משימות ממוקדות ופשוטות יחסית."},"בינונית — הסבר / ארגון / נימוק": {goal:"ברמת הסבר, ארגון מידע או נימוק.",focus:"יש לעודד תשובות מלאות יותר, ארגון ברור והסבר."},"מתקדמת — הסקה / ביסוס / השוואה": {goal:"ברמת הסקה, ביסוס או השוואה.",focus:"יש לדרוש קישור בין פרטים, ביסוס והשוואה."},"מעמיקה — הערכה / העברה / יצירה": {goal:"ברמת הערכה, העברה או יצירה.",focus:"יש לעודד חשיבה מורכבת, שיפוט והעברה להקשר חדש."}};
-    const GRADE_ORDER=["ב","ג","ד","ה","ו","ז","ח","ט"];
-    const els={grade:document.getElementById('grade'),domain:document.getElementById('domain'),topic:document.getElementById('topic'),skillGroups:document.getElementById('skillGroups'),stage:document.getElementById('stage'),level:document.getElementById('level'),skillGoal:document.getElementById('skillGoal'),contentGoal:document.getElementById('contentGoal'),pedagogyGoal:document.getElementById('pedagogyGoal'),skillInfo:document.getElementById('skillInfo'),stageInfo:document.getElementById('stageInfo'),panel:document.getElementById('panel'),source:document.getElementById('source'),lessonTopic:document.getElementById('lessonTopic'),customSkill:document.getElementById('customSkill'),worksheetMode:document.getElementById('worksheetMode'),worksheetQuestions:document.getElementById('worksheetQuestions'),interactiveItems:document.getElementById('interactiveItems'),fileInput:document.getElementById('fileInput'),fileStatus:document.getElementById('fileStatus'),uploadInstructions:document.getElementById('uploadInstructions'),aiTextType:document.getElementById('aiTextType'),aiLength:document.getElementById('aiLength'),aiTopic:document.getElementById('aiTopic'),aiLanguageLevel:document.getElementById('aiLanguageLevel'),aiKeywords:document.getElementById('aiKeywords'),improveText:document.getElementById('improveText'),improveAction:document.getElementById('improveAction'),manualBox:document.getElementById('manualBox'),uploadBox:document.getElementById('uploadBox'),aiBox:document.getElementById('aiBox'),improveBox:document.getElementById('improveBox'),nikudLevel:document.getElementById('nikudLevel'),nikudScope:document.getElementById('nikudScope'),nikudNote:document.getElementById('nikudNote')};
-    let currentTab='preview',latestPrompts={},uploadedText='',goalsTouched=false,selectedSkill=null;
-    function initGrades(){GRADE_ORDER.forEach(g=>els.grade.insertAdjacentHTML('beforeend',`<option value="${g}">כיתה ${g}</option>`));els.grade.value='ב'}
-    function getGradesUpTo(grade){return GRADE_ORDER.slice(0,GRADE_ORDER.indexOf(grade)+1)}
-    function populateDomains(){const domains=Object.keys(curriculum[els.grade.value]||{});els.domain.innerHTML=domains.map(d=>`<option value="${d}">${d}</option>`).join('')}
-    function getTopicsForDomainUpToGrade(){const grades=getGradesUpTo(els.grade.value);const set=new Set();grades.forEach(g=>{const obj=curriculum[g]?.[els.domain.value]||{};Object.keys(obj).forEach(t=>set.add(t));});const preferred=topicOrder[els.domain.value]||[];const listed=[...set];listed.sort((a,b)=>{const ia=preferred.indexOf(a),ib=preferred.indexOf(b);if(ia===-1&&ib===-1)return a.localeCompare(b,'he');if(ia===-1)return 1;if(ib===-1)return -1;return ia-ib});return listed}
-    function populateTopics(){const topics=getTopicsForDomainUpToGrade();els.topic.innerHTML=topics.map(t=>`<option value="${t}">${t}</option>`).join('')}
-    function getSkillsGrouped(){const grades=getGradesUpTo(els.grade.value);return grades.map(g=>({grade:g,skills:(curriculum[g]?.[els.domain.value]?.[els.topic.value])||[]})).filter(x=>x.skills.length)}
-    function effectiveSkill(){return els.customSkill.value.trim()||selectedSkill?.label||''}
-    function effectiveSkillSource(){return els.customSkill.value.trim() ? 'מותאם אישית' : (selectedSkill?.sourceGrade||'')}
-    function renderSkillGroups(){const groups=getSkillsGrouped();if(!groups.length){selectedSkill=null;els.skillGroups.innerHTML='<div class="muted-block">אין כרגע מיומנויות זמינות בנושא זה בטווח הכיתות שנבחר.</div>';return;}if(!selectedSkill||!groups.some(g=>g.skills.some(s=>s===selectedSkill.label&&g.grade===selectedSkill.sourceGrade))){const lastGroup=groups[groups.length-1];selectedSkill={sourceGrade:lastGroup.grade,label:lastGroup.skills[0]};}els.skillGroups.innerHTML=groups.map(group=>`<div class="skill-group"><h4>כיתה ${group.grade}</h4><div class="skill-options">${group.skills.map(skill=>`<button type="button" class="skill-chip ${selectedSkill && selectedSkill.label===skill && selectedSkill.sourceGrade===group.grade ? 'active' : ''}" data-grade="${group.grade}" data-skill="${escapeAttr(skill)}">${skill}</button>`).join('')}</div></div>`).join('');document.querySelectorAll('.skill-chip').forEach(btn=>btn.onclick=()=>{selectedSkill={sourceGrade:btn.dataset.grade,label:btn.dataset.skill};renderSkillGroups();renderSkillInfo();if(!goalsTouched)fillGoals('normal');renderAll();});}
-    function renderSkillInfo(){const skill=effectiveSkill();const source=effectiveSkillSource();if(!skill){els.skillInfo.innerHTML='<div class="muted-block">בחרי מיומנות ספציפית או כתבי מיומנות מותאמת אישית.</div>';return;}els.skillInfo.innerHTML=`<h3>${skill}</h3><div class="small"><strong>כיתת יעד:</strong> כיתה ${els.grade.value}</div><div class="small"><strong>תחום לימוד:</strong> ${els.domain.value}</div><div class="small"><strong>נושא בתוך התחום:</strong> ${els.topic.value}</div><div class="small"><strong>מקור המיומנות:</strong> ${source}</div><div class="callout">אם נכתבה מיומנות מותאמת אישית, היא תגבר על הבחירה מן הרשימה.</div>`;}
-    function renderStageInfo(){const s=stageData[els.stage.value];els.stageInfo.innerHTML=`<h3>${els.stage.value}</h3><div class="small"><strong>מטרת השלב:</strong> ${s.goal}</div><div class="small" style="margin-top:8px"><strong>דגש פדגוגי:</strong> ${s.focus}</div>`}
-    function ageText(g){if(g==='ב'||g==='ג')return{goal:'בהתאמה לשפה פשוטה וליכולת הקריאה של תלמידים צעירים.',focus:'יש לשמור על שפה פשוטה, הוראות קצרות, ריווח נוח ולעיתים ניקוד.'};if(g==='ד'||g==='ה'||g==='ו')return{goal:'בהתאמה לרמת ביניים המשלבת בהירות עם עלייה הדרגתית בעצמאות.',focus:'יש לשמור על בהירות, תרגול מדורג ועומס מתון.'};return{goal:'בהתאמה ללומדים בוגרים יותר ולדרישה גבוהה יותר לעצמאות ולנימוק.',focus:'אפשר לדרוש יותר עצמאות, ניתוח וביסוס.'}}
-    function effectiveNikudLevel(){if(els.nikudLevel.value==='auto'){return (els.grade.value==='ב'||els.grade.value==='ג')?'ניקוד מלא':'ללא ניקוד'}if(els.nikudLevel.value==='full')return 'ניקוד מלא';if(els.nikudLevel.value==='partial')return 'ניקוד חלקי';return 'ללא ניקוד'}
-    function effectiveNikudScope(){if(effectiveNikudLevel()==='ניקוד מלא')return 'את כל התוצר';if(els.nikudScope.value==='instructions_keywords')return 'הוראות ומילים חדשות';if(els.nikudScope.value==='instructions_only')return 'רק הוראות';return 'את כל התוצר'}
-    function syncNikudUI(){const young=(els.grade.value==='ב'||els.grade.value==='ג');if(young&&els.nikudLevel.value==='auto'){els.nikudNote.textContent='בכיתות ב׳–ג׳ כאשר נבחר מצב אוטומטי, כל התוצרים יופקו עם ניקוד מלא לכל התוצר.';}else{els.nikudNote.textContent=`רמת הניקוד הפעילה: ${effectiveNikudLevel()} | היקף הניקוד: ${effectiveNikudScope()}`;}}
-    function fillGoals(mode='normal'){const skill=effectiveSkill();if(!skill)return;const age=ageText(els.grade.value),stage=stageData[els.stage.value],level=levelData[els.level.value],topic=els.lessonTopic.value.trim();let sg=`התלמידים יתנסו במיומנות "${skill}" במסגרת תחום "${els.domain.value}" והנושא "${els.topic.value}". ${stage.goal} ${level.goal} ${age.goal}`;let cg=topic?`התלמידים יעמיקו בנושא התוכן "${topic}" דרך קריאה, שיחה או כתיבה, וירחיבו את הידע, ההבנה ואוצר המילים הקשור לנושא.`:`התלמידים יעמיקו בנושא התוכן המרכזי של השיעור דרך הטקסט והמשימות הנלוות.`;let pg=`יש לבנות משימות הממוקדות במיומנות הספציפית, ובמקביל לשלב את נושא התוכן בדוגמאות, בטקסטים ובשאלות. ${stage.focus} ${level.focus} ${age.focus}`;if(mode==='short'){sg=`התלמידים יתנסו במיומנות "${skill}".`;cg=topic?`התלמידים יעסקו בנושא "${topic}".`:cg;pg=`${stage.focus} ${level.focus}`;}if(mode==='long'){sg+=` יש להבליט את הצעדים, האסטרטגיות והשפה הנדרשים לביצוע המיומנות.`;cg+=` יש לדאוג שהטקסט ונושא השיעור יתרמו להבנת התוכן ולא ישמשו רק כרקע טכני לתרגול.`;pg+=` יש להקפיד על הלימה בין המיומנות, התוכן, סוגי התוצרים ורמת הכיתה.`;}els.skillGoal.value=sg;els.contentGoal.value=cg;els.pedagogyGoal.value=pg;goalsTouched=false;renderAll();}
-    function getSelectedProducts(){return[...document.querySelectorAll('[data-product]')].filter(x=>x.checked).map(x=>x.dataset.product)}
-    function getSourceMode(){return document.querySelector('input[name="sourceMode"]:checked')?.value||'manual'}
-    function toggleSourceBoxes(){const m=getSourceMode();els.manualBox.classList.toggle('hidden',m!=='manual');els.uploadBox.classList.toggle('hidden',m!=='upload');els.aiBox.classList.toggle('hidden',m!=='ai');els.improveBox.classList.toggle('hidden',m!=='improve')}
-    function getSourceInstruction(){const m=getSourceMode();if(m==='manual')return`השתמש בטקסט הבא כבסיס: ${els.source.value}`;if(m==='upload')return`המשתמש העלה קובץ.${uploadedText?` תוכן שהתקבל: ${uploadedText}`:''} ${els.uploadInstructions.value?`הנחיות נוספות: ${els.uploadInstructions.value}`:''}`;if(m==='ai')return`כתוב תחילה ${els.aiTextType.value} ${els.aiLength.value} בנושא "${els.aiTopic.value}" ברמת שפה ${els.aiLanguageLevel.value}. שלב את המילים/הרעיונות הבאים: ${els.aiKeywords.value}. לאחר מכן בנה על בסיסו את התוצרים.`;return`שפר תחילה את הטקסט הבא: ${els.improveText.value}. פעולת השיפור המבוקשת: ${els.improveAction.value}. לאחר מכן בנה על בסיסו את התוצרים.`;}
-    function state(){return{grade:els.grade.value,gradeLabel:`כיתה ${els.grade.value}`,domain:els.domain.value,topic:els.topic.value,skill:effectiveSkill(),sourceGrade:effectiveSkillSource(),lessonTopic:els.lessonTopic.value.trim(),stage:els.stage.value,level:els.level.value,skillGoal:els.skillGoal.value,contentGoal:els.contentGoal.value,pedagogyGoal:els.pedagogyGoal.value,sourceMode:getSourceMode(),sourceInstruction:getSourceInstruction(),worksheetMode:els.worksheetMode.value,worksheetQuestions:els.worksheetQuestions.value,interactiveItems:els.interactiveItems.value,products:getSelectedProducts(),nikudLevel:effectiveNikudLevel(),nikudScope:effectiveNikudScope()}}
-    function buildPrompts(s){const lessonTopicText=s.lessonTopic?`נושא התוכן של השיעור: ${s.lessonTopic}. `:'';const sourceSkillText=s.sourceGrade?`מקור המיומנות: ${s.sourceGrade}. `:'';const selectedProductsText=s.products.length?`התוצרים שנבחרו לשיעור: ${s.products.join(' , ')}. `:'';const worksheetModeText=s.worksheetMode==='interactive'?'סוג דף העבודה: אינטראקטיבי. ':'סוג דף העבודה: מיועד להדפסה. ';const base=`קהל יעד: ${s.gradeLabel}. תחום לימוד: ${s.domain}. נושא בתוך התחום: ${s.topic}. מיומנות ספציפית: ${s.skill}. ${sourceSkillText}${lessonTopicText}${selectedProductsText}${worksheetModeText}שלב הוראה מרכזי: ${s.stage}. רמת ביצוע: ${s.level}. מטרות מבחינת המיומנות: ${s.skillGoal} מטרות מבחינת התוכן: ${s.contentGoal} דגשים פדגוגיים: ${s.pedagogyGoal} מקור התוכן: ${s.sourceMode}. ${s.sourceInstruction} רמת הניקוד בתוצרים: ${s.nikudLevel}. מה לנקד: ${s.nikudScope}. אם נדרש ניקוד, יש להקפיד על ניקוד תקין ועקבי בעברית. כל תוצר חייב להיות HTML עצמאי, RTL מלא וקריא.`;const p={};if(s.products.includes('מערך שיעור למורה'))p['מערך שיעור למורה']=`${base}\n\nצור מערך שיעור מלא למורה כקובץ HTML נפרד. המערך צריך לקחת בחשבון את כל התוצרים שנבחרו על ידי המשתמש, ובמיוחד לשלב במידת הצורך מצגת, דף עבודה, פעילות אינטראקטיבית, טקסט מלווה ומפתח תשובות. בנה את המהלך לפי שלבי הוראת המיומנות: פתיחה וחיבור לידע קודם, הקניה מפורשת, תרגול מונחה, תרגול עצמאי, סיכום ורפלקציה. כלול מטרות מיומנות, מטרות תוכן, מהלך זמן משוער, הוראות למורה, שאלות מנחות, ושימוש בתוצרים שנבחרו.`;if(s.products.includes('קובץ טקסט מלווה לשיעור'))p['קובץ טקסט מלווה לשיעור']=`${base}\n\nצור קובץ HTML נפרד שמכיל רק את הטקסט המלווה לשיעור. הטקסט צריך להתאים לכיתה, למיומנות, לנושא השיעור, לרמת השפה ולניקוד שנבחר.`;if(s.products.includes('דף עבודה לתרגול')){p['דף עבודה לתרגול']=`${base}\n\nצור דף עבודה עם בדיוק ${s.worksheetQuestions} שאלות. השאלות צריכות להיות מכוונות ישירות למיומנות "${s.skill}" וגם לשלב את נושא התוכן של השיעור.`;if(s.worksheetMode==='interactive'){p['דף עבודה לתרגול']+=`\n\nחשוב: דף העבודה צריך להיות אינטראקטיבי. צור קובץ HTML שמאפשר לתלמידים לענות ישירות על המסך, עם שדות קלט, כפתורי בדיקה או משוב, וחוויית שימוש דיגיטלית ברורה. אפשרות הדפסה אינה המרכז; הדגש הוא עבודה אינטראקטיבית במחשב או בטאבלט.`;}else{p['דף עבודה לתרגול']+=`\n\nחשוב: דף העבודה צריך להיות מיועד בראש ובראשונה להדפסה. עצב אותו כעמוד עבודה מודפס, עם ריווח ברור לכתיבה ידנית, שוליים נוחים, חלוקה ברורה בין שאלות, וללא תלות בפעולות אינטראקטיביות דיגיטליות. אפשר לאפשר גם עבודה על מסך, אך הדגש המרכזי הוא תוצר ידידותי להדפסה.`;}}if(s.products.includes('פעילות אינטראקטיבית'))p['פעילות אינטראקטיבית']=`${base}\n\nצור פעילות אינטראקטיבית עם בדיוק ${s.interactiveItems} פריטים. כל פריט צריך לבדוק או לתרגל את המיומנות "${s.skill}".`;if(s.products.includes('מצגת להקניה'))p['מצגת להקניה']=`${base}\n\nצור מצגת להקניה ב-HTML, שמסבירה ומדגימה את המיומנות "${s.skill}", ומשלבת גם את נושא התוכן.`;if(s.products.includes('מפתח תשובות'))p['מפתח תשובות']=`${base}\n\nצור מפתח תשובות מותאם לכל השאלות והמשימות שנוצרו.`;return p;}
-    function previewHTML(s){const worksheetModeLabel=s.worksheetMode==='interactive'?'אינטראקטיבי':'להדפסה';return `<div class="demo"><div class="badge">${s.gradeLabel}</div><div class="badge">${s.domain}</div><div class="badge">${s.topic}</div><div class="badge">${s.skill||'ללא מיומנות'}</div><div class="badge">${s.stage}</div><div class="badge">${s.nikudLevel}</div><div class="badge">דף עבודה: ${worksheetModeLabel}</div><h2 style="margin:8px 0 12px;color:#0b7492;font-family:'Rubik','Heebo',sans-serif">תצוגה מקדימה</h2><div class="demo"><strong>מטרות מיומנות:</strong><br>${escapeHtml(s.skillGoal).replace(/\n/g,'<br>')}</div><div class="demo"><strong>מטרות תוכן:</strong><br>${escapeHtml(s.contentGoal).replace(/\n/g,'<br>')}</div><div class="demo"><strong>דגשים פדגוגיים:</strong><br>${escapeHtml(s.pedagogyGoal).replace(/\n/g,'<br>')}</div><div class="seq"><strong>תוצרים שנבחרו:</strong> ${s.products.join(' • ')||'לא נבחרו תוצרים'}</div><div class="demo"><strong>נושא שיעור:</strong> ${s.lessonTopic||'לא הוזן'} | <strong>מקור מיומנות:</strong> ${s.sourceGrade||'—'}</div></div>`}
-    function promptsHTML(){const entries=Object.entries(latestPrompts);if(!entries.length)return '<div class="small">לא נבחרו תוצרים.</div>';return entries.map(([title,text])=>`<div class="prompt"><div class="prompt-head"><h3>${title}</h3><button class="btn secondary copy-btn" data-title="${escapeAttr(title)}">העתק פרומפט</button></div><div class="code">${escapeHtml(text)}</div></div>`).join('')}
-    function bindCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>btn.onclick=async()=>{const t=latestPrompts[btn.dataset.title];if(!t)return;try{await navigator.clipboard.writeText(t);alert(`הפרומפט של "${btn.dataset.title}" הועתק`)}catch(e){alert('לא הצלחתי להעתיק אוטומטית.')}})}
-    function escapeHtml(str){return String(str).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
-    function escapeAttr(str){return String(str).replace(/"/g,'&quot;')}
-    function renderAll(){const s=state();syncNikudUI();latestPrompts=buildPrompts(s);els.panel.innerHTML=currentTab==='preview'?previewHTML(s):promptsHTML();bindCopy()}
-    document.querySelectorAll('.tab').forEach(tab=>tab.onclick=()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');currentTab=tab.dataset.tab;renderAll()});
-    document.querySelectorAll('input[name="sourceMode"]').forEach(r=>r.addEventListener('change',()=>{toggleSourceBoxes();renderAll()}));
-    els.grade.addEventListener('change',()=>{populateDomains();populateTopics();renderSkillGroups();renderSkillInfo();syncNikudUI();if(!goalsTouched)fillGoals('normal');renderAll()});
-    els.domain.addEventListener('change',()=>{populateTopics();renderSkillGroups();renderSkillInfo();if(!goalsTouched)fillGoals('normal');renderAll()});
-    els.topic.addEventListener('change',()=>{renderSkillGroups();renderSkillInfo();if(!goalsTouched)fillGoals('normal');renderAll()});
-    [els.stage,els.level,els.nikudLevel,els.nikudScope,els.worksheetMode].forEach(el=>el.addEventListener('change',()=>{renderStageInfo();syncNikudUI();if(!goalsTouched)fillGoals('normal');renderAll()}));
-    [els.source,els.lessonTopic,els.customSkill,els.skillGoal,els.contentGoal,els.pedagogyGoal,els.worksheetQuestions,els.interactiveItems,els.uploadInstructions,els.aiTextType,els.aiLength,els.aiTopic,els.aiLanguageLevel,els.aiKeywords,els.improveText,els.improveAction].forEach(el=>el.addEventListener('input',()=>{if([els.skillGoal,els.contentGoal,els.pedagogyGoal].includes(el)){goalsTouched=true;} if(!goalsTouched && (el===els.lessonTopic||el===els.customSkill)) fillGoals('normal'); renderSkillInfo(); renderAll();}));
-    document.querySelectorAll('[data-product]').forEach(el=>el.addEventListener('change',renderAll));
-    document.getElementById('fillBtn').onclick=()=>fillGoals('normal');document.getElementById('shortBtn').onclick=()=>fillGoals('short');document.getElementById('longBtn').onclick=()=>fillGoals('long');
-    els.fileInput.addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;els.fileStatus.classList.remove('hidden');els.fileStatus.textContent=`נטען קובץ: ${file.name}`;try{uploadedText=await file.text();els.fileStatus.textContent=`נטען קובץ: ${file.name}. נקראו ${uploadedText.length} תווים.`;}catch(err){uploadedText='';els.fileStatus.textContent=`הקובץ ${file.name} נבחר, אך לא נקרא כטקסט.`}renderAll()});
-    initGrades();populateDomains();populateTopics();renderSkillGroups();renderSkillInfo();renderStageInfo();syncNikudUI();fillGoals('normal');toggleSourceBoxes();renderAll();
+    const frame = document.getElementById('appFrame');
+
+    function injectOpeningFields(){
+      const w = frame.contentWindow;
+      const d = w.document;
+      if (!d || d.getElementById('openingStyle')) return;
+
+      const lessonTopicInput = d.getElementById('lessonTopic');
+      if (!lessonTopicInput) return;
+      const lessonSection = lessonTopicInput.closest('.section');
+      if (!lessonSection || !lessonSection.parentElement) return;
+
+      const wrapper = d.createElement('div');
+      wrapper.className = 'section';
+      wrapper.innerHTML = `
+        <label class="label">אופי פתיחת השיעור</label>
+        <select id="openingStyle" class="select">
+          <option value="question" selected>שאלה מעוררת חשיבה</option>
+          <option value="prior_knowledge">חיבור לידע קודם</option>
+          <option value="riddle">חידה / אתגר</option>
+          <option value="visual">תמונה / גירוי חזותי</option>
+          <option value="story">סיפורון קצר</option>
+          <option value="game">משחק פתיחה</option>
+          <option value="flexible">פתיחה חופשית לפי שיקול פדגוגי</option>
+        </select>
+        <div class="small" style="margin-top:6px">שדה זה ישפיע במיוחד על מערך השיעור למורה ועל המצגת.</div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label class="label">מידת החשיבות של פתיחה חווייתית</label>
+            <select id="openingPriority" class="select">
+              <option value="required">חובה לכלול פתיחה חווייתית</option>
+              <option value="preferred" selected>רצוי לכלול אם מתאים</option>
+              <option value="not_required">לא נדרש</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">רעיון נוסף לפתיחה (רשות)</label>
+            <input id="openingIdea" class="input" placeholder="למשל: חידה קצרה על התוכן, שאלה על חוויות התלמידים, תמונה מפתיעה" />
+          </div>
+        </div>
+      `;
+      lessonSection.insertAdjacentElement('afterend', wrapper);
+
+      const controls = [
+        d.getElementById('openingStyle'),
+        d.getElementById('openingPriority'),
+        d.getElementById('openingIdea')
+      ];
+      controls.forEach(el => {
+        if (!el) return;
+        const eventName = el.tagName === 'INPUT' ? 'input' : 'change';
+        el.addEventListener(eventName, () => {
+          if (typeof w.renderAll === 'function') w.renderAll();
+        });
+      });
+    }
+
+    function openingStyleLabel(value){
+      return {
+        question:'שאלה מעוררת חשיבה',
+        prior_knowledge:'חיבור לידע קודם',
+        riddle:'חידה / אתגר',
+        visual:'תמונה / גירוי חזותי',
+        story:'סיפורון קצר',
+        game:'משחק פתיחה',
+        flexible:'פתיחה חופשית לפי שיקול פדגוגי'
+      }[value] || 'פתיחה חווייתית';
+    }
+
+    function openingPriorityLabel(value){
+      return {
+        required:'חובה לכלול פתיחה חווייתית',
+        preferred:'רצוי לכלול אם מתאים',
+        not_required:'לא נדרש'
+      }[value] || 'רצוי לכלול אם מתאים';
+    }
+
+    function patchPromptGeneration(){
+      const w = frame.contentWindow;
+      const d = w.document;
+      if (!w || !d || !w.buildPrompts || w.__openingPatched) return;
+
+      const originalBuildPrompts = w.buildPrompts;
+      const originalPreviewHTML = w.previewHTML;
+
+      w.buildPrompts = function(s){
+        const prompts = originalBuildPrompts(s);
+        const style = d.getElementById('openingStyle')?.value || 'question';
+        const priority = d.getElementById('openingPriority')?.value || 'preferred';
+        const idea = d.getElementById('openingIdea')?.value?.trim() || '';
+        const openingInstruction = `\n\nהנחיה לפתיחת השיעור: יש לתכנן פתיחה חווייתית בסגנון "${openingStyleLabel(style)}". מידת החשיבות: "${openingPriorityLabel(priority)}". הפתיחה צריכה להתחבר לנושא התוכן, לעורר סקרנות, להפעיל ידע קודם או חשיבה ראשונית, ולהוביל באופן טבעי למיומנות הנלמדת. יש לפרט מה המורה אומרת או שואלת, מה התלמידים עושים, כיצד הפתיחה מקשרת בין התוכן למיומנות, וכמה זמן מוקצה לפתיחה.${idea ? ` רעיון נוסף לפתיחה: ${idea}.` : ''}`;
+        if (prompts['מערך שיעור למורה']) {
+          prompts['מערך שיעור למורה'] += openingInstruction;
+        }
+        if (prompts['מצגת להקניה']) {
+          prompts['מצגת להקניה'] += `\n\nבמצגת יש לכלול שקופית פתיחה חווייתית בהתאם לבחירה: "${openingStyleLabel(style)}". מידת החשיבות: "${openingPriorityLabel(priority)}". שקופית הפתיחה צריכה להיות קצרה, מסקרנת וברורה, וליצור מעבר טבעי מהפתיחה אל ההקניה.${idea ? ` רעיון נוסף לפתיחה: ${idea}.` : ''}`;
+        }
+        return prompts;
+      };
+
+      w.previewHTML = function(s){
+        let html = originalPreviewHTML(s);
+        const style = d.getElementById('openingStyle')?.value || 'question';
+        const priority = d.getElementById('openingPriority')?.value || 'preferred';
+        const idea = d.getElementById('openingIdea')?.value?.trim() || '';
+        const block = `<div class="demo"><strong>פתיחת שיעור:</strong> ${openingStyleLabel(style)}<br><strong>מידת חשיבות:</strong> ${openingPriorityLabel(priority)}${idea ? `<br><strong>רעיון נוסף:</strong> ${idea}` : ''}</div>`;
+        return html.replace('</div></div>', `${block}</div></div>`);
+      };
+
+      w.__openingPatched = true;
+      if (typeof w.renderAll === 'function') w.renderAll();
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(() => {
+        injectOpeningFields();
+        patchPromptGeneration();
+      }, 800);
+    });
   </script>
 </body>
 </html>
