@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — app-v28</title>
+  <style>
+    html,body{margin:0;height:100%;background:#eef4f8}
+    iframe{width:100%;height:100%;border:none;display:block;background:#fff}
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="./app-v27.html" title="app-v27"></iframe>
+  <script>
+    const frame = document.getElementById('appFrame');
+
+    function injectOpeningFields(){
+      const w = frame.contentWindow;
+      const d = w.document;
+      if (!d || d.getElementById('openingStyle')) return;
+
+      const lessonTopicInput = d.getElementById('lessonTopic');
+      if (!lessonTopicInput) return;
+      const lessonSection = lessonTopicInput.closest('.section');
+      if (!lessonSection || !lessonSection.parentElement) return;
+
+      const wrapper = d.createElement('div');
+      wrapper.className = 'section';
+      wrapper.innerHTML = `
+        <label class="label">אופי פתיחת השיעור</label>
+        <select id="openingStyle" class="select">
+          <option value="question" selected>שאלה מעוררת חשיבה</option>
+          <option value="prior_knowledge">חיבור לידע קודם</option>
+          <option value="riddle">חידה / אתגר</option>
+          <option value="visual">תמונה / גירוי חזותי</option>
+          <option value="story">סיפורון קצר</option>
+          <option value="game">משחק פתיחה</option>
+          <option value="flexible">פתיחה חופשית לפי שיקול פדגוגי</option>
+        </select>
+        <div class="small" style="margin-top:6px">שדה זה ישפיע במיוחד על מערך השיעור למורה ועל המצגת.</div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label class="label">מידת החשיבות של פתיחה חווייתית</label>
+            <select id="openingPriority" class="select">
+              <option value="required">חובה לכלול פתיחה חווייתית</option>
+              <option value="preferred" selected>רצוי לכלול אם מתאים</option>
+              <option value="not_required">לא נדרש</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">רעיון נוסף לפתיחה (רשות)</label>
+            <input id="openingIdea" class="input" placeholder="למשל: חידה קצרה על התוכן, שאלה על חוויות התלמידים, תמונה מפתיעה" />
+          </div>
+        </div>
+      `;
+      lessonSection.insertAdjacentElement('afterend', wrapper);
+
+      const controls = [
+        d.getElementById('openingStyle'),
+        d.getElementById('openingPriority'),
+        d.getElementById('openingIdea')
+      ];
+      controls.forEach(el => {
+        if (!el) return;
+        const eventName = el.tagName === 'INPUT' ? 'input' : 'change';
+        el.addEventListener(eventName, () => {
+          if (typeof w.renderAll === 'function') w.renderAll();
+        });
+      });
+    }
+
+    function openingStyleLabel(value){
+      return {
+        question:'שאלה מעוררת חשיבה',
+        prior_knowledge:'חיבור לידע קודם',
+        riddle:'חידה / אתגר',
+        visual:'תמונה / גירוי חזותי',
+        story:'סיפורון קצר',
+        game:'משחק פתיחה',
+        flexible:'פתיחה חופשית לפי שיקול פדגוגי'
+      }[value] || 'פתיחה חווייתית';
+    }
+
+    function openingPriorityLabel(value){
+      return {
+        required:'חובה לכלול פתיחה חווייתית',
+        preferred:'רצוי לכלול אם מתאים',
+        not_required:'לא נדרש'
+      }[value] || 'רצוי לכלול אם מתאים';
+    }
+
+    function patchPromptGeneration(){
+      const w = frame.contentWindow;
+      const d = w.document;
+      if (!w || !d || !w.buildPrompts || w.__openingPatched) return;
+
+      const originalBuildPrompts = w.buildPrompts;
+      const originalPreviewHTML = w.previewHTML;
+
+      w.buildPrompts = function(s){
+        const prompts = originalBuildPrompts(s);
+        const style = d.getElementById('openingStyle')?.value || 'question';
+        const priority = d.getElementById('openingPriority')?.value || 'preferred';
+        const idea = d.getElementById('openingIdea')?.value?.trim() || '';
+        const openingInstruction = `\n\nהנחיה לפתיחת השיעור: יש לתכנן פתיחה חווייתית בסגנון "${openingStyleLabel(style)}". מידת החשיבות: "${openingPriorityLabel(priority)}". הפתיחה צריכה להתחבר לנושא התוכן, לעורר סקרנות, להפעיל ידע קודם או חשיבה ראשונית, ולהוביל באופן טבעי למיומנות הנלמדת. יש לפרט מה המורה אומרת או שואלת, מה התלמידים עושים, כיצד הפתיחה מקשרת בין התוכן למיומנות, וכמה זמן מוקצה לפתיחה.${idea ? ` רעיון נוסף לפתיחה: ${idea}.` : ''}`;
+        if (prompts['מערך שיעור למורה']) {
+          prompts['מערך שיעור למורה'] += openingInstruction;
+        }
+        if (prompts['מצגת להקניה']) {
+          prompts['מצגת להקניה'] += `\n\nבמצגת יש לכלול שקופית פתיחה חווייתית בהתאם לבחירה: "${openingStyleLabel(style)}". מידת החשיבות: "${openingPriorityLabel(priority)}". שקופית הפתיחה צריכה להיות קצרה, מסקרנת וברורה, וליצור מעבר טבעי מהפתיחה אל ההקניה.${idea ? ` רעיון נוסף לפתיחה: ${idea}.` : ''}`;
+        }
+        return prompts;
+      };
+
+      w.previewHTML = function(s){
+        let html = originalPreviewHTML(s);
+        const style = d.getElementById('openingStyle')?.value || 'question';
+        const priority = d.getElementById('openingPriority')?.value || 'preferred';
+        const idea = d.getElementById('openingIdea')?.value?.trim() || '';
+        const block = `<div class="demo"><strong>פתיחת שיעור:</strong> ${openingStyleLabel(style)}<br><strong>מידת חשיבות:</strong> ${openingPriorityLabel(priority)}${idea ? `<br><strong>רעיון נוסף:</strong> ${idea}` : ''}</div>`;
+        return html.replace('</div></div>', `${block}</div></div>`);
+      };
+
+      w.__openingPatched = true;
+      if (typeof w.renderAll === 'function') w.renderAll();
+    }
+
+    frame.addEventListener('load', () => {
+      setTimeout(() => {
+        injectOpeningFields();
+        patchPromptGeneration();
+      }, 800);
+    });
+  </script>
+</body>
+</html>
