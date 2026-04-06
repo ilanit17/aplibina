@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>סטודיו לשיעורי שפה — app-v29</title>
+  <title>סטודיו לשיעורי שפה — app-v30</title>
   <style>
     html,body{margin:0;height:100%;background:#eef4f8}
     iframe{width:100%;height:100%;border:none;display:block;background:#fff}
@@ -13,6 +13,21 @@
   <iframe id="appFrame" src="../app-v27.html" title="app-v27"></iframe>
   <script>
     const frame = document.getElementById('appFrame');
+
+    function clean(value){
+      return String(value ?? '')
+        .replace(/\s+/g, ' ')
+        .replace(/\s+([,.!?;:])/g, '$1')
+        .trim();
+    }
+
+    function hasText(value){
+      return clean(value).length > 0;
+    }
+
+    function joinBlocks(parts){
+      return parts.filter(Boolean).join('\n\n');
+    }
 
     function injectOpeningFields(){
       const w = frame.contentWindow;
@@ -60,6 +75,7 @@
         d.getElementById('openingPriority'),
         d.getElementById('openingIdea')
       ];
+
       controls.forEach(el => {
         if (!el) return;
         const eventName = el.tagName === 'INPUT' ? 'input' : 'change';
@@ -89,39 +105,203 @@
       }[value] || 'רצוי לכלול אם מתאים';
     }
 
+    function getOpeningData(d){
+      return {
+        style: d.getElementById('openingStyle')?.value || 'question',
+        priority: d.getElementById('openingPriority')?.value || 'preferred',
+        idea: clean(d.getElementById('openingIdea')?.value || '')
+      };
+    }
+
+    function formatSourceInstruction(s, d){
+      const mode = s.sourceMode;
+      if (mode === 'ai') {
+        const textType = clean(d.getElementById('aiTextType')?.value || 'טקסט');
+        const length = clean(d.getElementById('aiLength')?.value || 'בינוני');
+        const topic = clean(d.getElementById('aiTopic')?.value || s.lessonTopic || '');
+        const langLevel = clean(d.getElementById('aiLanguageLevel')?.value || '');
+        const keywords = clean(d.getElementById('aiKeywords')?.value || '');
+        return joinBlocks([
+          `מקור התוכן: יצירה על ידי בינה.`,
+          `יש לכתוב תחילה ${textType} ${length}${topic ? ` בנושא "${topic}"` : ''}${langLevel ? ` ברמת שפה ${langLevel}` : ''}.`,
+          keywords ? `שלב את המילים/הרעיונות הבאים: ${keywords}.` : '',
+          `אם נדרש עיבוד של טקסט הבסיס לצורך התאמה לגיל או למיומנות, בצע זאת לפני הפקת התוצר הנוכחי בלבד.`
+        ]);
+      }
+
+      if (mode === 'improve') {
+        return joinBlocks([
+          `מקור התוכן: שיפור טקסט קיים על ידי בינה.`,
+          clean(s.sourceInstruction)
+        ]);
+      }
+
+      if (mode === 'upload') {
+        return joinBlocks([
+          `מקור התוכן: קובץ שהעלה המשתמש.`,
+          clean(s.sourceInstruction)
+        ]);
+      }
+
+      return joinBlocks([
+        `מקור התוכן: טקסט שסיפק המשתמש.`,
+        clean(s.sourceInstruction)
+      ]);
+    }
+
+    function htmlRules(product){
+      const base = [
+        `החזר HTML מלא בלבד.`,
+        `הקובץ חייב להיות עצמאי, תקין, RTL מלא וקריא.`,
+        `יש להשתמש ב-CSS פנימי בתוך הקובץ.`,
+        `יש לכלול עיצוב נוח לקריאה במחשב ובנייד.`,
+        `יש להוסיף כפתור גלוי בשם "הורדת קובץ HTML" שמאפשר הורדה של הקובץ למחשב.`,
+        `אין להחזיר קטע HTML חלקי ואין להוסיף הסברים מחוץ לקוד.`
+      ];
+
+      if (product === 'דף עבודה לתרגול' || product === 'מערך שיעור למורה' || product === 'קובץ טקסט מלווה לשיעור' || product === 'מפתח תשובות') {
+        base.push(`יש לכלול גם סגנונות ידידותיים להדפסה כאשר הדבר רלוונטי לתוצר.`);
+      }
+
+      return base.join('\n');
+    }
+
+    function productInstruction(product, s, opening){
+      const openingText = `יש לתכנן פתיחה חווייתית בסגנון "${openingStyleLabel(opening.style)}". מידת החשיבות: "${openingPriorityLabel(opening.priority)}".${opening.idea ? ` רעיון נוסף: ${opening.idea}.` : ''}`;
+
+      switch (product) {
+        case 'מערך שיעור למורה':
+          return joinBlocks([
+            `התוצר הנוכחי: מערך שיעור למורה בלבד.`,
+            `צור מערך שיעור מלא למורה כקובץ HTML נפרד.`,
+            `השתמש בשאר התוצרים שנבחרו כהקשר תכנוני בלבד, אך אל תיצור אותם כעת.`,
+            `בנה את המהלך לפי שלבים: פתיחה וחיבור לידע קודם, הקניה מפורשת, תרגול מונחה, תרגול עצמאי, סיכום ורפלקציה.`,
+            `יש להדגיש במיוחד את השלב המרכזי שנבחר בטופס: "${s.stage}".`,
+            openingText,
+            `כלול: מטרות מיומנות, מטרות תוכן, זמן משוער, הוראות למורה, שאלות מנחות, שימוש בתוצרים שנבחרו, התאמות לרמת הביצוע, ודגשים לשפה ולניקוד לפי שכבת הגיל.`,
+            `אין ליצור קבצים אחרים ואין לצרף דף עבודה, מצגת, פעילות או טקסט מלווה בתוך הפלט.`
+          ]);
+
+        case 'קובץ טקסט מלווה לשיעור':
+          return joinBlocks([
+            `התוצר הנוכחי: קובץ טקסט מלווה לשיעור בלבד.`,
+            `צור קובץ HTML נפרד שמכיל רק את הטקסט המלווה לשיעור.`,
+            `הטקסט צריך להתאים לכיתה, למיומנות, לנושא השיעור, לרמת השפה ולניקוד שנבחר.`,
+            `הוסף כותרת, גוף טקסט ברור, ובמידת הצורך גם מילים קשות או שאלות טרום-קריאה קצרות.`,
+            `אם הטקסט שנוצר או עובד אינו מתאים לגיל, יש להתאים אותו לפני הפקת התוצר.`,
+            `אין ליצור מערך שיעור, דף עבודה, פעילות אינטראקטיבית, מצגת או מפתח תשובות.`
+          ]);
+
+        case 'דף עבודה לתרגול':
+          return joinBlocks([
+            `התוצר הנוכחי: דף עבודה לתרגול בלבד.`,
+            `צור דף עבודה עם בדיוק ${s.worksheetQuestions} שאלות.`,
+            `כל השאלות חייבות להיות מכוונות ישירות למיומנות "${s.skill}" ולשלב גם את נושא התוכן של השיעור.`,
+            s.worksheetMode === 'interactive'
+              ? `דף העבודה צריך להיות אינטראקטיבי, עם שדות קלט, משוב ברור וכפתורי פעולה מתאימים.`
+              : `דף העבודה צריך להיות מיועד בראש ובראשונה להדפסה, עם ריווח ברור לכתיבה ידנית, שוליים נוחים וחלוקה ברורה בין השאלות.`,
+            `אין ליצור מערך שיעור, טקסט מלווה, פעילות אינטראקטיבית נפרדת, מצגת או מפתח תשובות.`
+          ]);
+
+        case 'פעילות אינטראקטיבית':
+          return joinBlocks([
+            `התוצר הנוכחי: פעילות אינטראקטיבית בלבד.`,
+            `צור פעילות אינטראקטיבית עם בדיוק ${s.interactiveItems} פריטים.`,
+            `כל פריט צריך לבדוק או לתרגל את המיומנות "${s.skill}".`,
+            `הפעילות צריכה להיות ברורה, נגישה, מתאימה לגיל, עם משוב מיידי או אינדיקציה להתקדמות.`,
+            `אין ליצור מערך שיעור, דף עבודה, טקסט מלווה, מצגת או מפתח תשובות.`
+          ]);
+
+        case 'מצגת להקניה':
+          return joinBlocks([
+            `התוצר הנוכחי: מצגת להקניה בלבד.`,
+            `צור מצגת ב-HTML שמסבירה ומדגימה את המיומנות "${s.skill}", ומשלבת את נושא התוכן.`,
+            `יש לכלול רצף שקופיות ברור וקצר, מותאם לגיל היעד, עם הדגמה ודוגמה.`,
+            `יש לכלול שקופית פתיחה בהתאם להנחיית הפתיחה: ${openingStyleLabel(opening.style)}. מידת החשיבות: ${openingPriorityLabel(opening.priority)}.${opening.idea ? ` רעיון נוסף: ${opening.idea}.` : ''}`,
+            `אין ליצור מערך שיעור, דף עבודה, פעילות אינטראקטיבית, טקסט מלווה או מפתח תשובות.`
+          ]);
+
+        case 'מפתח תשובות':
+          return joinBlocks([
+            `התוצר הנוכחי: מפתח תשובות בלבד.`,
+            `צור מפתח תשובות מותאם לתוצרים הלימודיים שאמורים להיבנות במסגרת השיעור, אך הפק כעת רק את מפתח התשובות.`,
+            `יש לנסח תשובות ברורות, קצרות ומדויקות, מותאמות לשכבת הגיל ולמיומנות.`,
+            `אין ליצור את דף העבודה עצמו או תוצרים אחרים.`
+          ]);
+
+        default:
+          return `התוצר הנוכחי: ${product} בלבד.`;
+      }
+    }
+
+    function buildSinglePrompt(s, d, product){
+      const opening = getOpeningData(d);
+
+      return joinBlocks([
+        `[תפקיד]`,
+        `אתה מחולל תוצרים פדגוגיים בעברית. עליך להפיק כעת תוצר אחד בלבד.`,
+
+        `[נתוני קלט מחייבים]`,
+        `קהל יעד: ${s.gradeLabel}.`,
+        `תחום לימוד: ${s.domain}.`,
+        `נושא בתוך התחום: ${s.topic}.`,
+        `מיומנות ספציפית: ${s.skill}.`,
+        hasText(s.sourceGrade) ? `מקור המיומנות שנבחרה: ${s.sourceGrade}.` : '',
+        hasText(s.lessonTopic) ? `נושא התוכן של השיעור: ${s.lessonTopic}.` : '',
+        `שלב הוראה מרכזי: ${s.stage}.`,
+        `רמת ביצוע: ${s.level}.`,
+        `מטרות מבחינת המיומנות: ${clean(s.skillGoal)}`,
+        `מטרות מבחינת התוכן: ${clean(s.contentGoal)}`,
+        `דגשים פדגוגיים: ${clean(s.pedagogyGoal)}`,
+        `רמת הניקוד בתוצרים: ${s.nikudLevel}.`,
+        `מה לנקד: ${s.nikudScope}.`,
+        hasText(s.worksheetMode) ? `סוג דף העבודה שנבחר במערכת: ${s.worksheetMode === 'interactive' ? 'אינטראקטיבי' : 'מיועד להדפסה'}.` : '',
+        hasText(s.products?.join('')) ? `התוצרים שנבחרו במערכת: ${s.products.join(' , ')}.` : '',
+
+        `[הנחיות מקור התוכן]`,
+        formatSourceInstruction(s, d),
+
+        `[כללי עבודה מחייבים]`,
+        `הפק כעת תוצר אחד בלבד: "${product}".`,
+        `השתמש בשאר התוצרים שנבחרו כהקשר בלבד, לא כפלט נוכחי.`,
+        `אל תערבב בין כמה תוצרים באותה תשובה.`,
+        `אל תוסיף הסברים על תהליך העבודה.`,
+        `אל תחזור על כל נתוני הקלט בתוך גוף התוצר.`,
+        `אם שדה כלשהו ריק או לא מולא, התעלם ממנו ואל תדפיס ניסוח ריק.`,
+        `אם חסר מידע קריטי או יש סתירה מהותית, החזר רק את הכותרת "MISSING INFORMATION:" ולאחריה רשימה קצרה של הפרטים החסרים או הסותרים.`,
+        `אם נדרש ניקוד, יש להקפיד על ניקוד תקין ועקבי בעברית.`,
+
+        `[הנחיות לתוצר הנוכחי]`,
+        productInstruction(product, s, opening),
+
+        `[כללי HTML]`,
+        htmlRules(product)
+      ]);
+    }
+
     function patchPromptGeneration(){
       const w = frame.contentWindow;
       const d = w.document;
-      if (!w || !d || !w.buildPrompts || w.__openingPatched) return;
+      if (!w || !d || !w.buildPrompts || w.__promptPatched) return;
 
-      const originalBuildPrompts = w.buildPrompts;
       const originalPreviewHTML = w.previewHTML;
 
       w.buildPrompts = function(s){
-        const prompts = originalBuildPrompts(s);
-        const style = d.getElementById('openingStyle')?.value || 'question';
-        const priority = d.getElementById('openingPriority')?.value || 'preferred';
-        const idea = d.getElementById('openingIdea')?.value?.trim() || '';
-        const openingInstruction = `\n\nהנחיה לפתיחת השיעור: יש לתכנן פתיחה חווייתית בסגנון "${openingStyleLabel(style)}". מידת החשיבות: "${openingPriorityLabel(priority)}". הפתיחה צריכה להתחבר לנושא התוכן, לעורר סקרנות, להפעיל ידע קודם או חשיבה ראשונית, ולהוביל באופן טבעי למיומנות הנלמדת. יש לפרט מה המורה אומרת או שואלת, מה התלמידים עושים, כיצד הפתיחה מקשרת בין התוכן למיומנות, וכמה זמן מוקצה לפתיחה.${idea ? ` רעיון נוסף לפתיחה: ${idea}.` : ''}`;
-        if (prompts['מערך שיעור למורה']) {
-          prompts['מערך שיעור למורה'] += openingInstruction;
-        }
-        if (prompts['מצגת להקניה']) {
-          prompts['מצגת להקניה'] += `\n\nבמצגת יש לכלול שקופית פתיחה חווייתית בהתאם לבחירה: "${openingStyleLabel(style)}". מידת החשיבות: "${openingPriorityLabel(priority)}". שקופית הפתיחה צריכה להיות קצרה, מסקרנת וברורה, וליצור מעבר טבעי מהפתיחה אל ההקניה.${idea ? ` רעיון נוסף לפתיחה: ${idea}.` : ''}`;
-        }
+        const prompts = {};
+        (s.products || []).forEach(product => {
+          prompts[product] = buildSinglePrompt(s, d, product);
+        });
         return prompts;
       };
 
       w.previewHTML = function(s){
         let html = originalPreviewHTML(s);
-        const style = d.getElementById('openingStyle')?.value || 'question';
-        const priority = d.getElementById('openingPriority')?.value || 'preferred';
-        const idea = d.getElementById('openingIdea')?.value?.trim() || '';
-        const block = `<div class="demo"><strong>פתיחת שיעור:</strong> ${openingStyleLabel(style)}<br><strong>מידת חשיבות:</strong> ${openingPriorityLabel(priority)}${idea ? `<br><strong>רעיון נוסף:</strong> ${idea}` : ''}</div>`;
+        const opening = getOpeningData(d);
+        const block = `<div class="demo"><strong>מנוע פרומפטים:</strong> תוצר אחד בכל פעם<br><strong>פתיחת שיעור:</strong> ${openingStyleLabel(opening.style)}<br><strong>מידת חשיבות:</strong> ${openingPriorityLabel(opening.priority)}${opening.idea ? `<br><strong>רעיון נוסף:</strong> ${opening.idea}` : ''}</div>`;
         return html.replace('</div></div>', `${block}</div></div>`);
       };
 
-      w.__openingPatched = true;
+      w.__promptPatched = true;
       if (typeof w.renderAll === 'function') w.renderAll();
     }
 
@@ -129,7 +309,7 @@
       setTimeout(() => {
         injectOpeningFields();
         patchPromptGeneration();
-      }, 800);
+      }, 900);
     });
   </script>
 </body>
