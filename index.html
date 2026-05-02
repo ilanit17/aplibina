@@ -1,32 +1,154 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI in Education Presentation Editor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Rubik', sans-serif;
-      }
-    </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — app-v31-agency</title>
+  <style>
+    html,body{margin:0;height:100%;background:#eef4f8}
+    iframe{width:100%;height:100%;border:none;display:block;background:#fff}
+  </style>
 </head>
-<body class="bg-slate-50">
-    <div id="root"></div>
-<script type="module" src="/index.tsx"></script>
+<body>
+  <iframe id="appFrame" src="../app-v27.html" title="app-v27"></iframe>
+  <script>
+    const frame = document.getElementById('appFrame');
+    function clean(v){return String(v??'').replace(/\s+/g,' ').replace(/\s+([,.!?;:])/g,'$1').trim();}
+    function hasText(v){return clean(v).length>0;}
+    function joinBlocks(p){return p.filter(Boolean).join('\n\n');}
+
+    const AGENCY=[
+      {id:'challenge',name:'אתגר ויציאה מאזור הנוחות',icon:'\u{1F525}',desc:'משימה הדורשת מאמץ שאינו שגרתי',prompt:'אתגר ויציאה מאזור הנוחות \u2014 שלב רכיב שמחייב את התלמידים להתמודד עם משימה מאתגרת שחורגת מהשגרה. האתגר יכול להיות קוגניטיבי, בינאישי או רגשי.',min:15},
+      {id:'responsibility',name:'אחריות',icon:'\u{1F3AF}',desc:'בעלות ממשית על תוצר או תהליך',prompt:'אחריות \u2014 הקצה לתלמידים אחריות ממשית: תכנון, הובלה, הכנת חומרים או קבלת החלטות. האחריות צריכה להיות אותנטית.',min:10},
+      {id:'complexity',name:'תכנים מערערים',icon:'\u{1F9E9}',desc:'מפגש עם דילמות ונקודות מבט שונות',prompt:'תכנים מערערים \u2014 שלב סוגיה שאינה ניתנת לפתרון חד-משמעי, הדורשת בחינה מכמה נקודות מבט וגיבוש עמדה אישית.',min:10},
+      {id:'reflection',name:'מסגרת לרפלקציה',icon:'\u{1FA9E}',desc:'עיבוד החוויה \u2014 עבר ועתיד',prompt:'מסגרת לרפלקציה \u2014 שלב רגע רפלקציה מובנה: מה הייתה ההחלטה הכי קשה? מה למדתי? מה אעשה אחרת?',min:5},
+      {id:'group',name:'קבוצה',icon:'\u{1F465}',desc:'תלות הדדית וכוח הקולקטיב',prompt:'קבוצה \u2014 עצב משימה שדורשת תלות הדדית אמיתית. כל תלמיד מחזיק חלק חיוני.',min:15},
+      {id:'skills',name:'מיומנויות וכלים תומכי Agency',icon:'\u{1F9F0}',desc:'הצבת מטרות, תכנון והפקת לקחים',prompt:'מיומנויות וכלים תומכי Agency \u2014 למד במפורש כלי של הכוונה עצמית: הצבת מטרה, פירוק לתוכנית, ניהול זמן.',min:10},
+      {id:'choice',name:'סביבת בחירה, ביטוי והשפעה',icon:'\u{1F30D}',desc:'בחירה בנושא, בדרך או בתוצר',prompt:'סביבת בחירה \u2014 אפשר לתלמידים לבחור בין נושאים, דרכי למידה, או סוגי תוצר. צור במה להצגת תוצרים.',min:5}
+    ];
+
+    function getRecommended(m){
+      if(m<=30)return['reflection','choice'];
+      if(m<=45)return['challenge','responsibility','reflection','choice'];
+      if(m<=90)return['challenge','responsibility','complexity','reflection','skills','choice'];
+      return AGENCY.map(function(p){return p.id;});
+    }
+    function durationLabel(m){
+      if(m<=30)return 'שיעור קצר \u2014 מומלץ 2-3 עקרונות';
+      if(m<=45)return 'שיעור סטנדרטי \u2014 מומלץ 3-4 עקרונות';
+      if(m<=90)return 'שיעור כפול \u2014 מומלץ 5-6 עקרונות';
+      return 'מהלך מורחב \u2014 ניתן לשלב את כל 7 העקרונות';
+    }
+
+    function injectOpeningFields(){
+      var w=frame.contentWindow,d=w.document;
+      if(!d||d.getElementById('openingStyle'))return;
+      var inp=d.getElementById('lessonTopic');
+      if(!inp)return;
+      var sec=inp.closest('.section');
+      if(!sec||!sec.parentElement)return;
+
+      var wr=d.createElement('div');
+      wr.className='section';
+      wr.innerHTML='<label class="label">\u05D0\u05D5\u05E4\u05D9 \u05E4\u05EA\u05D9\u05D7\u05EA \u05D4\u05E9\u05D9\u05E2\u05D5\u05E8</label><select id="openingStyle" class="select"><option value="question" selected>\u05E9\u05D0\u05DC\u05D4 \u05DE\u05E2\u05D5\u05E8\u05E8\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4</option><option value="prior_knowledge">\u05D7\u05D9\u05D1\u05D5\u05E8 \u05DC\u05D9\u05D3\u05E2 \u05E7\u05D5\u05D3\u05DD</option><option value="riddle">\u05D7\u05D9\u05D3\u05D4 / \u05D0\u05EA\u05D2\u05E8</option><option value="visual">\u05EA\u05DE\u05D5\u05E0\u05D4 / \u05D2\u05D9\u05E8\u05D5\u05D9 \u05D7\u05D6\u05D5\u05EA\u05D9</option><option value="story">\u05E1\u05D9\u05E4\u05D5\u05E8\u05D5\u05DF \u05E7\u05E6\u05E8</option><option value="game">\u05DE\u05E9\u05D7\u05E7 \u05E4\u05EA\u05D9\u05D7\u05D4</option><option value="flexible">\u05E4\u05EA\u05D9\u05D7\u05D4 \u05D7\u05D5\u05E4\u05E9\u05D9\u05EA</option></select><div class="small" style="margin-top:6px">\u05E9\u05D3\u05D4 \u05D6\u05D4 \u05D9\u05E9\u05E4\u05D9\u05E2 \u05D1\u05DE\u05D9\u05D5\u05D7\u05D3 \u05E2\u05DC \u05DE\u05E2\u05E8\u05DA \u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 \u05DC\u05DE\u05D5\u05E8\u05D4 \u05D5\u05E2\u05DC \u05D4\u05DE\u05E6\u05D2\u05EA.</div><div class="row" style="margin-top:12px"><div><label class="label">\u05DE\u05D9\u05D3\u05EA \u05D4\u05D7\u05E9\u05D9\u05D1\u05D5\u05EA \u05E9\u05DC \u05E4\u05EA\u05D9\u05D7\u05D4 \u05D7\u05D5\u05D5\u05D9\u05D9\u05EA\u05D9\u05EA</label><select id="openingPriority" class="select"><option value="required">\u05D7\u05D5\u05D1\u05D4 \u05DC\u05DB\u05DC\u05D5\u05DC \u05E4\u05EA\u05D9\u05D7\u05D4 \u05D7\u05D5\u05D5\u05D9\u05D9\u05EA\u05D9\u05EA</option><option value="preferred" selected>\u05E8\u05E6\u05D5\u05D9 \u05DC\u05DB\u05DC\u05D5\u05DC \u05D0\u05DD \u05DE\u05EA\u05D0\u05D9\u05DD</option><option value="not_required">\u05DC\u05D0 \u05E0\u05D3\u05E8\u05E9</option></select></div><div><label class="label">\u05E8\u05E2\u05D9\u05D5\u05DF \u05E0\u05D5\u05E1\u05E3 \u05DC\u05E4\u05EA\u05D9\u05D7\u05D4 (\u05E8\u05E9\u05D5\u05EA)</label><input id="openingIdea" class="input" placeholder="\u05DC\u05DE\u05E9\u05DC: \u05D7\u05D9\u05D3\u05D4, \u05E9\u05D0\u05DC\u05D4 \u05E2\u05DC \u05D7\u05D5\u05D5\u05D9\u05D5\u05EA" /></div></div>';
+      sec.insertAdjacentElement('afterend',wr);
+
+      var agSec=d.createElement('div');
+      agSec.className='section';
+      var cards='';
+      for(var i=0;i<AGENCY.length;i++){
+        var p=AGENCY[i];
+        cards+='<label class="ag-card" data-pid="'+p.id+'" data-min="'+p.min+'"><input type="checkbox" class="ag-cb" id="ag_'+p.id+'" value="'+p.id+'" /><span class="ag-icon">'+p.icon+'</span><div><div class="ag-name">'+p.name+'</div><div class="ag-desc">'+p.desc+'</div><div class="ag-time">\u23F1 \u05DE\u05D9\u05E0\u05D9\u05DE\u05D5\u05DD '+p.min+' \u05D3\u05E7\u05F3</div></div></label>';
+      }
+      agSec.innerHTML='<style>.ag-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}.ag-ttl{font-weight:700;font-size:15px;color:#1a1a1a;display:flex;align-items:center;gap:6px}.ag-badge{background:#ea580c;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}.ag-dur{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}.ag-dur label{font-size:13px;font-weight:600;color:#555;white-space:nowrap}.ag-dur-in{width:80px;padding:6px 10px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;text-align:center;font-family:inherit}.ag-dur-in:focus{outline:none;border-color:#ea580c;box-shadow:0 0 0 3px rgba(234,88,12,.12)}.ag-hint{font-size:11px;color:#ea580c;font-weight:600}.ag-auto{background:#fff7ed;color:#c2410c;border:1.5px solid #fed7aa;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}.ag-auto:hover{background:#ea580c;color:white;border-color:#ea580c}.ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px}.ag-card{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;background:white}.ag-card:hover{border-color:#fed7aa;background:#fffbf5}.ag-card.on{border-color:#ea580c;background:#fff7ed;box-shadow:0 0 0 3px rgba(234,88,12,.08)}.ag-card.dim{opacity:.45}.ag-cb{margin-top:2px;width:16px;height:16px;accent-color:#ea580c;flex-shrink:0;cursor:pointer}.ag-icon{font-size:18px;flex-shrink:0;margin-top:1px}.ag-name{font-size:13px;font-weight:700;color:#1a1a1a}.ag-desc{font-size:11px;color:#78716c;margin-top:1px}.ag-time{font-size:10px;color:#a8a29e;margin-top:2px}.ag-note{font-size:11px;color:#78716c;margin-top:8px;padding:8px 12px;background:#f8fafc;border-radius:8px;border-right:3px solid #ea580c}</style><div class="ag-hdr"><div class="ag-ttl">\u{1F9ED} \u05E9\u05D9\u05DC\u05D5\u05D1 \u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05E4\u05E2\u05DC\u05E0\u05D5\u05EA (Agency) <span class="ag-badge">\u05D7\u05D3\u05E9</span></div></div><div class="ag-dur"><label>\u05DE\u05E9\u05DA \u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 (\u05D3\u05E7\u05D5\u05EA):</label><input type="number" id="agDuration" class="ag-dur-in" value="45" min="10" max="300" step="5" /><span id="agHint" class="ag-hint"></span><button type="button" id="agAuto" class="ag-auto">\u05D1\u05D7\u05D9\u05E8\u05D4 \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA \u05DC\u05E4\u05D9 \u05D6\u05DE\u05DF</button></div><div class="ag-grid" id="agGrid">'+cards+'</div><div class="ag-note">\u{1F4A1} <strong>\u05D8\u05D9\u05E4:</strong> \u05D1\u05E9\u05D9\u05E2\u05D5\u05E8 \u05E7\u05E6\u05E8, \u05D4\u05EA\u05DE\u05E7\u05D3\u05D5 \u05D1-2-3 \u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA. \u05D4\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05D9\u05E9\u05D5\u05DC\u05D1\u05D5 \u05D1\u05E4\u05E8\u05D5\u05DE\u05E4\u05D8\u05D9\u05DD.</div>';
+      wr.insertAdjacentElement('afterend',agSec);
+
+      var ctrls=[d.getElementById('openingStyle'),d.getElementById('openingPriority'),d.getElementById('openingIdea')];
+      ctrls.forEach(function(el){if(!el)return;el.addEventListener(el.tagName==='INPUT'?'input':'change',function(){if(typeof w.renderAll==='function')w.renderAll();});});
+
+      var durIn=d.getElementById('agDuration'),hint=d.getElementById('agHint'),autoBtn=d.getElementById('agAuto');
+      function updHint(){var m=parseInt(durIn.value)||0;hint.textContent=m>0?durationLabel(m):'';d.querySelectorAll('.ag-card').forEach(function(c){var mn=parseInt(c.dataset.min)||0;var cb=c.querySelector('.ag-cb');c.classList.toggle('dim',m>0&&m<mn&&!cb.checked);});}
+      function updStyles(){d.querySelectorAll('.ag-card').forEach(function(c){c.classList.toggle('on',c.querySelector('.ag-cb').checked);});if(typeof w.renderAll==='function')w.renderAll();}
+      durIn.addEventListener('input',function(){updHint();if(typeof w.renderAll==='function')w.renderAll();});
+      autoBtn.addEventListener('click',function(){var rec=getRecommended(parseInt(durIn.value)||45);d.querySelectorAll('.ag-cb').forEach(function(cb){cb.checked=rec.includes(cb.value);});updStyles();updHint();});
+      d.querySelectorAll('.ag-cb').forEach(function(cb){cb.addEventListener('change',updStyles);});
+      updHint();
+      autoBtn.click();
+    }
+
+    function getOpeningData(d){return{style:d.getElementById('openingStyle')?.value||'question',priority:d.getElementById('openingPriority')?.value||'preferred',idea:clean(d.getElementById('openingIdea')?.value||'')};}
+    function getAgencyData(d){var dur=parseInt(d.getElementById('agDuration')?.value)||0;var sel=[];d.querySelectorAll('.ag-cb:checked').forEach(function(cb){var p=AGENCY.find(function(x){return x.id===cb.value;});if(p)sel.push(p);});return{duration:dur,selected:sel};}
+    function openingStyleLabel(v){return{question:'\u05E9\u05D0\u05DC\u05D4 \u05DE\u05E2\u05D5\u05E8\u05E8\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4',prior_knowledge:'\u05D7\u05D9\u05D1\u05D5\u05E8 \u05DC\u05D9\u05D3\u05E2 \u05E7\u05D5\u05D3\u05DD',riddle:'\u05D7\u05D9\u05D3\u05D4 / \u05D0\u05EA\u05D2\u05E8',visual:'\u05EA\u05DE\u05D5\u05E0\u05D4 / \u05D2\u05D9\u05E8\u05D5\u05D9 \u05D7\u05D6\u05D5\u05EA\u05D9',story:'\u05E1\u05D9\u05E4\u05D5\u05E8\u05D5\u05DF \u05E7\u05E6\u05E8',game:'\u05DE\u05E9\u05D7\u05E7 \u05E4\u05EA\u05D9\u05D7\u05D4',flexible:'\u05E4\u05EA\u05D9\u05D7\u05D4 \u05D7\u05D5\u05E4\u05E9\u05D9\u05EA'}[v]||'\u05E4\u05EA\u05D9\u05D7\u05D4';}
+    function openingPriorityLabel(v){return{required:'\u05D7\u05D5\u05D1\u05D4 \u05DC\u05DB\u05DC\u05D5\u05DC',preferred:'\u05E8\u05E6\u05D5\u05D9 \u05DC\u05DB\u05DC\u05D5\u05DC',not_required:'\u05DC\u05D0 \u05E0\u05D3\u05E8\u05E9'}[v]||'\u05E8\u05E6\u05D5\u05D9';}
+
+    function agencyBlock(ag,product){
+      if(!ag.selected.length)return'';
+      var list=ag.selected.map(function(p,i){return(i+1)+'. '+p.icon+' '+p.prompt;}).join('\n');
+      var tn=ag.duration>0?'\u05DE\u05E9\u05DA \u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 '+ag.duration+' \u05D3\u05E7\u05D5\u05EA. \u05D4\u05EA\u05D0\u05DD \u05D0\u05EA \u05D4\u05D9\u05E7\u05E3 \u05E9\u05D9\u05DC\u05D5\u05D1 \u05D4\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D6\u05DE\u05DF.':'';
+      var pn=product==='\u05DE\u05E2\u05E8\u05DA \u05E9\u05D9\u05E2\u05D5\u05E8 \u05DC\u05DE\u05D5\u05E8\u05D4'?'\u05E9\u05DC\u05D1 \u05D0\u05EA \u05D4\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05D1\u05EA\u05D5\u05DA \u05DE\u05D4\u05DC\u05DA \u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 \u2014 \u05E6\u05D9\u05D9\u05DF \u05D1\u05DB\u05DC \u05E9\u05DC\u05D1 \u05D0\u05D9\u05D6\u05D4 \u05E2\u05E7\u05E8\u05D5\u05DF \u05DE\u05EA\u05DE\u05DE\u05E9.':'\u05E9\u05DC\u05D1 \u05D0\u05EA \u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05D4\u05E4\u05E2\u05DC\u05E0\u05D5\u05EA \u05D1\u05E6\u05D5\u05E8\u05D4 \u05D8\u05D1\u05E2\u05D9\u05EA.';
+      return joinBlocks(['[\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05E4\u05E2\u05DC\u05E0\u05D5\u05EA \u05DC\u05E9\u05D9\u05DC\u05D5\u05D1]','\u05E0\u05D1\u05D7\u05E8\u05D5 '+ag.selected.length+' \u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA.',tn,pn,'','\u05D4\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA:',list,'','\u05D4\u05E0\u05D7\u05D9\u05D5\u05EA: \u05E9\u05DC\u05D1 \u05D0\u05D5\u05E8\u05D2\u05E0\u05D9\u05EA, \u05D4\u05EA\u05D0\u05DD \u05DC\u05D6\u05DE\u05DF, \u05D0\u05DC \u05EA\u05E6\u05D9\u05D9\u05DF \u05E9\u05DE\u05D5\u05EA \u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05EA\u05DC\u05DE\u05D9\u05D3\u05D9\u05DD, \u05D1\u05DE\u05E2\u05E8\u05DA \u05DC\u05DE\u05D5\u05E8\u05D4 \u05E6\u05D9\u05D9\u05DF \u05D1\u05D4\u05E2\u05E8\u05D5\u05EA \u05E6\u05D3.']);
+    }
+
+    function formatSourceInstruction(s,d){
+      var mode=s.sourceMode;
+      if(mode==='ai'){var tt=clean(d.getElementById('aiTextType')?.value||'\u05D8\u05E7\u05E1\u05D8'),ln=clean(d.getElementById('aiLength')?.value||'\u05D1\u05D9\u05E0\u05D5\u05E0\u05D9'),tp=clean(d.getElementById('aiTopic')?.value||s.lessonTopic||''),ll=clean(d.getElementById('aiLanguageLevel')?.value||''),kw=clean(d.getElementById('aiKeywords')?.value||'');return joinBlocks(['\u05DE\u05E7\u05D5\u05E8 \u05D4\u05EA\u05D5\u05DB\u05DF: \u05D9\u05E6\u05D9\u05E8\u05D4 \u05E2\u05DC \u05D9\u05D3\u05D9 \u05D1\u05D9\u05E0\u05D4.','\u05D9\u05E9 \u05DC\u05DB\u05EA\u05D5\u05D1 \u05EA\u05D7\u05D9\u05DC\u05D4 '+tt+' '+ln+(tp?' \u05D1\u05E0\u05D5\u05E9\u05D0 "'+tp+'"':'')+(ll?' \u05D1\u05E8\u05DE\u05EA \u05E9\u05E4\u05D4 '+ll:'')+'.',kw?'\u05E9\u05DC\u05D1: '+kw+'.':'','\u05D0\u05DD \u05E0\u05D3\u05E8\u05E9 \u05E2\u05D9\u05D1\u05D5\u05D3, \u05D1\u05E6\u05E2 \u05DC\u05E4\u05E0\u05D9 \u05D4\u05E4\u05E7\u05EA \u05D4\u05EA\u05D5\u05E6\u05E8.']);}
+      if(mode==='improve')return joinBlocks(['\u05DE\u05E7\u05D5\u05E8: \u05E9\u05D9\u05E4\u05D5\u05E8 \u05D8\u05E7\u05E1\u05D8 \u05E7\u05D9\u05D9\u05DD.',clean(s.sourceInstruction)]);
+      if(mode==='upload')return joinBlocks(['\u05DE\u05E7\u05D5\u05E8: \u05E7\u05D5\u05D1\u05E5 \u05E9\u05D4\u05D5\u05E2\u05DC\u05D4.',clean(s.sourceInstruction)]);
+      return joinBlocks(['\u05DE\u05E7\u05D5\u05E8: \u05D8\u05E7\u05E1\u05D8 \u05E9\u05E1\u05D5\u05E4\u05E7.',clean(s.sourceInstruction)]);
+    }
+
+    function htmlRules(product){
+      var b=['\u05D4\u05D7\u05D6\u05E8 HTML \u05DE\u05DC\u05D0.','\u05E2\u05E6\u05DE\u05D0\u05D9, \u05EA\u05E7\u05D9\u05DF, RTL.','\u05E2\u05D9\u05E6\u05D5\u05D1 \u05E0\u05D5\u05D7 \u05DC\u05DE\u05D7\u05E9\u05D1 \u05D5\u05E0\u05D9\u05D9\u05D3.','\u05DB\u05E4\u05EA\u05D5\u05E8 \u05D4\u05D5\u05E8\u05D3\u05EA HTML.','\u05D0\u05D9\u05DF \u05E7\u05D8\u05E2 \u05D7\u05DC\u05E7\u05D9.'];
+      if(['\u05D3\u05E3 \u05E2\u05D1\u05D5\u05D3\u05D4 \u05DC\u05EA\u05E8\u05D2\u05D5\u05DC','\u05DE\u05E2\u05E8\u05DA \u05E9\u05D9\u05E2\u05D5\u05E8 \u05DC\u05DE\u05D5\u05E8\u05D4','\u05E7\u05D5\u05D1\u05E5 \u05D8\u05E7\u05E1\u05D8 \u05DE\u05DC\u05D5\u05D5\u05D4 \u05DC\u05E9\u05D9\u05E2\u05D5\u05E8','\u05DE\u05E4\u05EA\u05D7 \u05EA\u05E9\u05D5\u05D1\u05D5\u05EA'].indexOf(product)>=0)b.push('\u05E1\u05D2\u05E0\u05D5\u05E0\u05D5\u05EA \u05DC\u05D4\u05D3\u05E4\u05E1\u05D4.');
+      return b.join('\n');
+    }
+
+    function productInstruction(product,s,opening){
+      var oTxt='\u05E4\u05EA\u05D9\u05D7\u05D4: "'+openingStyleLabel(opening.style)+'". \u05D7\u05E9\u05D9\u05D1\u05D5\u05EA: "'+openingPriorityLabel(opening.priority)+'".'+(opening.idea?' \u05E8\u05E2\u05D9\u05D5\u05DF: '+opening.idea+'.':'');
+      if(product==='\u05DE\u05E2\u05E8\u05DA \u05E9\u05D9\u05E2\u05D5\u05E8 \u05DC\u05DE\u05D5\u05E8\u05D4')return joinBlocks(['\u05D4\u05EA\u05D5\u05E6\u05E8: \u05DE\u05E2\u05E8\u05DA \u05E9\u05D9\u05E2\u05D5\u05E8 \u05DC\u05DE\u05D5\u05E8\u05D4.','\u05E6\u05D5\u05E8 \u05DE\u05E2\u05E8\u05DA \u05DE\u05DC\u05D0 \u05DB-HTML.','\u05E9\u05D0\u05E8 \u05D4\u05EA\u05D5\u05E6\u05E8\u05D9\u05DD = \u05D4\u05E7\u05E9\u05E8 \u05D1\u05DC\u05D1\u05D3.','\u05E9\u05DC\u05D1\u05D9\u05DD: \u05E4\u05EA\u05D9\u05D7\u05D4, \u05D4\u05E7\u05E0\u05D9\u05D4, \u05EA\u05E8\u05D2\u05D5\u05DC \u05DE\u05D5\u05E0\u05D7\u05D4, \u05EA\u05E8\u05D2\u05D5\u05DC \u05E2\u05E6\u05DE\u05D0\u05D9, \u05E1\u05D9\u05DB\u05D5\u05DD \u05D5\u05E8\u05E4\u05DC\u05E7\u05E6\u05D9\u05D4.','\u05D4\u05D3\u05D2\u05E9 \u05E9\u05DC\u05D1: "'+s.stage+'".',oTxt,'\u05DB\u05DC\u05D5\u05DC: \u05DE\u05D8\u05E8\u05D5\u05EA, \u05D6\u05DE\u05DF, \u05D4\u05D5\u05E8\u05D0\u05D5\u05EA, \u05E9\u05D0\u05DC\u05D5\u05EA, \u05D4\u05EA\u05D0\u05DE\u05D5\u05EA, \u05D3\u05D2\u05E9\u05D9 \u05E9\u05E4\u05D4.','\u05D0\u05D9\u05DF \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD.']);
+      if(product==='\u05E7\u05D5\u05D1\u05E5 \u05D8\u05E7\u05E1\u05D8 \u05DE\u05DC\u05D5\u05D5\u05D4 \u05DC\u05E9\u05D9\u05E2\u05D5\u05E8')return joinBlocks(['\u05D4\u05EA\u05D5\u05E6\u05E8: \u05D8\u05E7\u05E1\u05D8 \u05DE\u05DC\u05D5\u05D5\u05D4.','\u05D4\u05D8\u05E7\u05E1\u05D8 \u05DE\u05D5\u05EA\u05D0\u05DD \u05DC\u05DB\u05D9\u05EA\u05D4, \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA, \u05DC\u05E0\u05D5\u05E9\u05D0, \u05DC\u05E8\u05DE\u05D4 \u05D5\u05DC\u05E0\u05D9\u05E7\u05D5\u05D3.','\u05DB\u05D5\u05EA\u05E8\u05EA, \u05D2\u05D5\u05E3, \u05DE\u05D9\u05DC\u05D9\u05DD \u05E7\u05E9\u05D5\u05EA, \u05E9\u05D0\u05DC\u05D5\u05EA \u05D8\u05E8\u05D5\u05DD-\u05E7\u05E8\u05D9\u05D0\u05D4.','\u05D0\u05D9\u05DF \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD.']);
+      if(product==='\u05D3\u05E3 \u05E2\u05D1\u05D5\u05D3\u05D4 \u05DC\u05EA\u05E8\u05D2\u05D5\u05DC')return joinBlocks(['\u05D4\u05EA\u05D5\u05E6\u05E8: \u05D3\u05E3 \u05E2\u05D1\u05D5\u05D3\u05D4.','\u05D1\u05D3\u05D9\u05D5\u05E7 '+s.worksheetQuestions+' \u05E9\u05D0\u05DC\u05D5\u05EA \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA "'+s.skill+'".',s.worksheetMode==='interactive'?'\u05D0\u05D9\u05E0\u05D8\u05E8\u05D0\u05E7\u05D8\u05D9\u05D1\u05D9 \u05E2\u05DD \u05DE\u05E9\u05D5\u05D1.':'\u05DC\u05D4\u05D3\u05E4\u05E1\u05D4 \u05E2\u05DD \u05E8\u05D9\u05D5\u05D5\u05D7.','\u05D0\u05D9\u05DF \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD.']);
+      if(product==='\u05E4\u05E2\u05D9\u05DC\u05D5\u05EA \u05D0\u05D9\u05E0\u05D8\u05E8\u05D0\u05E7\u05D8\u05D9\u05D1\u05D9\u05EA')return joinBlocks(['\u05D4\u05EA\u05D5\u05E6\u05E8: \u05E4\u05E2\u05D9\u05DC\u05D5\u05EA \u05D0\u05D9\u05E0\u05D8\u05E8\u05D0\u05E7\u05D8\u05D9\u05D1\u05D9\u05EA.',s.interactiveItems+' \u05E4\u05E8\u05D9\u05D8\u05D9\u05DD \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA "'+s.skill+'".','\u05D1\u05E8\u05D5\u05E8\u05D4, \u05E0\u05D2\u05D9\u05E9\u05D4, \u05DE\u05EA\u05D0\u05D9\u05DE\u05D4, \u05E2\u05DD \u05DE\u05E9\u05D5\u05D1.','\u05D0\u05D9\u05DF \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD.']);
+      if(product==='\u05DE\u05E6\u05D2\u05EA \u05DC\u05D4\u05E7\u05E0\u05D9\u05D4')return joinBlocks(['\u05D4\u05EA\u05D5\u05E6\u05E8: \u05DE\u05E6\u05D2\u05EA.','\u05E9\u05E7\u05D5\u05E4\u05D9\u05D5\u05EA \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA "'+s.skill+'" + \u05E0\u05D5\u05E9\u05D0.','\u05E8\u05E6\u05E3 \u05D1\u05E8\u05D5\u05E8, \u05D4\u05D3\u05D2\u05DE\u05D4, \u05D3\u05D5\u05D2\u05DE\u05D4.','\u05E9\u05E7\u05D5\u05E4\u05D9\u05EA \u05E4\u05EA\u05D9\u05D7\u05D4: '+openingStyleLabel(opening.style)+'.'+(opening.idea?' \u05E8\u05E2\u05D9\u05D5\u05DF: '+opening.idea+'.':''),'\u05D0\u05D9\u05DF \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD.']);
+      if(product==='\u05DE\u05E4\u05EA\u05D7 \u05EA\u05E9\u05D5\u05D1\u05D5\u05EA')return joinBlocks(['\u05D4\u05EA\u05D5\u05E6\u05E8: \u05DE\u05E4\u05EA\u05D7 \u05EA\u05E9\u05D5\u05D1\u05D5\u05EA.','\u05EA\u05E9\u05D5\u05D1\u05D5\u05EA \u05D1\u05E8\u05D5\u05E8\u05D5\u05EA \u05D5\u05DE\u05D3\u05D5\u05D9\u05E7\u05D5\u05EA.','\u05D0\u05D9\u05DF \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD.']);
+      return '\u05D4\u05EA\u05D5\u05E6\u05E8: '+product+'.';
+    }
+
+    function buildSinglePrompt(s,d,product){
+      var opening=getOpeningData(d);
+      var agency=getAgencyData(d);
+      return joinBlocks([
+        '[\u05EA\u05E4\u05E7\u05D9\u05D3]','\u05D0\u05EA\u05D4 \u05DE\u05D7\u05D5\u05DC\u05DC \u05EA\u05D5\u05E6\u05E8\u05D9\u05DD \u05E4\u05D3\u05D2\u05D5\u05D2\u05D9\u05D9\u05DD \u05D1\u05E2\u05D1\u05E8\u05D9\u05EA. \u05D4\u05E4\u05E7 \u05EA\u05D5\u05E6\u05E8 \u05D0\u05D7\u05D3 \u05D1\u05DC\u05D1\u05D3.',
+        '[\u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05DC\u05D8]',
+        '\u05E7\u05D4\u05DC \u05D9\u05E2\u05D3: '+s.gradeLabel+'.','\u05EA\u05D7\u05D5\u05DD: '+s.domain+'.','\u05E0\u05D5\u05E9\u05D0: '+s.topic+'.','\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA: '+s.skill+'.',
+        hasText(s.sourceGrade)?'\u05DE\u05E7\u05D5\u05E8 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA: '+s.sourceGrade+'.':'',
+        hasText(s.lessonTopic)?'\u05E0\u05D5\u05E9\u05D0 \u05E9\u05D9\u05E2\u05D5\u05E8: '+s.lessonTopic+'.':'',
+        '\u05E9\u05DC\u05D1 \u05D4\u05D5\u05E8\u05D0\u05D4: '+s.stage+'.','\u05E8\u05DE\u05EA \u05D1\u05D9\u05E6\u05D5\u05E2: '+s.level+'.',
+        '\u05DE\u05D8\u05E8\u05D5\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA: '+clean(s.skillGoal),'\u05DE\u05D8\u05E8\u05D5\u05EA \u05EA\u05D5\u05DB\u05DF: '+clean(s.contentGoal),'\u05D3\u05D2\u05E9\u05D9\u05DD: '+clean(s.pedagogyGoal),
+        '\u05E0\u05D9\u05E7\u05D5\u05D3: '+s.nikudLevel+'. \u05DE\u05D4 \u05DC\u05E0\u05E7\u05D3: '+s.nikudScope+'.',
+        agency.duration>0?'\u05DE\u05E9\u05DA \u05E9\u05D9\u05E2\u05D5\u05E8: '+agency.duration+' \u05D3\u05E7\u05D5\u05EA.':'',
+        hasText(s.worksheetMode)?'\u05D3\u05E3 \u05E2\u05D1\u05D5\u05D3\u05D4: '+(s.worksheetMode==='interactive'?'\u05D0\u05D9\u05E0\u05D8\u05E8\u05D0\u05E7\u05D8\u05D9\u05D1\u05D9':'\u05DC\u05D4\u05D3\u05E4\u05E1\u05D4')+'.':'',
+        hasText(s.products?.join(''))?'\u05EA\u05D5\u05E6\u05E8\u05D9\u05DD: '+s.products.join(', ')+'.':'',
+        '[\u05DE\u05E7\u05D5\u05E8 \u05EA\u05D5\u05DB\u05DF]',formatSourceInstruction(s,d),
+        '[\u05DB\u05DC\u05DC\u05D9 \u05E2\u05D1\u05D5\u05D3\u05D4]',
+        '\u05D4\u05E4\u05E7 \u05E8\u05E7: "'+product+'".','\u05E9\u05D0\u05E8 = \u05D4\u05E7\u05E9\u05E8.','\u05D0\u05DC \u05EA\u05E2\u05E8\u05D1\u05D1.','\u05D0\u05DC \u05EA\u05D5\u05E1\u05D9\u05E3 \u05D4\u05E1\u05D1\u05E8\u05D9\u05DD.','\u05D4\u05EA\u05E2\u05DC\u05DD \u05DE\u05E9\u05D3\u05D5\u05EA \u05E8\u05D9\u05E7\u05D9\u05DD.','\u05D7\u05E1\u05E8 \u05DE\u05D9\u05D3\u05E2 \u05E7\u05E8\u05D9\u05D8\u05D9? \u05D4\u05D7\u05D6\u05E8 "MISSING INFORMATION:" + \u05E8\u05E9\u05D9\u05DE\u05D4.','\u05E0\u05D9\u05E7\u05D5\u05D3 \u05EA\u05E7\u05D9\u05DF.',
+        '[\u05D4\u05E0\u05D7\u05D9\u05D5\u05EA \u05EA\u05D5\u05E6\u05E8]',productInstruction(product,s,opening),
+        agencyBlock(agency,product),
+        '[\u05DB\u05DC\u05DC\u05D9 HTML]',htmlRules(product)
+      ]);
+    }
+
+    function patchPromptGeneration(){
+      var w=frame.contentWindow,d=w.document;
+      if(!w||!d||!w.buildPrompts||w.__promptPatched)return;
+      var origPreview=w.previewHTML;
+      w.buildPrompts=function(s){var prompts={};(s.products||[]).forEach(function(p){prompts[p]=buildSinglePrompt(s,d,p);});return prompts;};
+      w.previewHTML=function(s){var html=origPreview(s);var op=getOpeningData(d),ag=getAgencyData(d);var agI=ag.selected.length>0?'<br><strong>\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05E4\u05E2\u05DC\u05E0\u05D5\u05EA:</strong> '+ag.selected.map(function(p){return p.icon+' '+p.name;}).join(' | '):'<br><strong>\u05E2\u05E7\u05E8\u05D5\u05E0\u05D5\u05EA \u05E4\u05E2\u05DC\u05E0\u05D5\u05EA:</strong> \u05DC\u05D0 \u05E0\u05D1\u05D7\u05E8\u05D5';var dI=ag.duration>0?'<br><strong>\u05DE\u05E9\u05DA \u05E9\u05D9\u05E2\u05D5\u05E8:</strong> '+ag.duration+' \u05D3\u05E7\u05D5\u05EA':'';var block='<div class="demo"><strong>\u05DE\u05E0\u05D5\u05E2 \u05E4\u05E8\u05D5\u05DE\u05E4\u05D8\u05D9\u05DD:</strong> \u05EA\u05D5\u05E6\u05E8 \u05D0\u05D7\u05D3 \u05D1\u05DB\u05DC \u05E4\u05E2\u05DD<br><strong>\u05E4\u05EA\u05D9\u05D7\u05D4:</strong> '+openingStyleLabel(op.style)+'<br><strong>\u05D7\u05E9\u05D9\u05D1\u05D5\u05EA:</strong> '+openingPriorityLabel(op.priority)+(op.idea?'<br><strong>\u05E8\u05E2\u05D9\u05D5\u05DF:</strong> '+op.idea:'')+dI+agI+'</div>';return html.replace('</div></div>',block+'</div></div>');};
+      w.__promptPatched=true;
+      if(typeof w.renderAll==='function')w.renderAll();
+    }
+
+    frame.addEventListener('load',function(){setTimeout(function(){injectOpeningFields();patchPromptGeneration();},900);});
+  </script>
 </body>
 </html>
