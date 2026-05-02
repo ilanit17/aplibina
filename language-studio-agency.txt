@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סטודיו לשיעורי שפה — agency</title>
+  <style>
+    html,body{margin:0;height:100%;background:#eef4f8}
+    iframe{width:100%;height:100%;border:none;display:block;background:#fff}
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="../app-v27.html" title="app-v27"></iframe>
+  <script>
+    const frame = document.getElementById('appFrame');
+    function clean(v){return String(v??'').replace(/\s+/g,' ').replace(/\s+([,.!?;:])/g,'$1').trim();}
+    function hasText(v){return clean(v).length>0;}
+    function joinBlocks(p){return p.filter(Boolean).join('\n\n');}
+
+    const AGENCY=[
+      {id:'challenge',name:'אתגר ויציאה מאזור הנוחות',icon:'🔥',desc:'משימה הדורשת מאמץ שאינו שגרתי',prompt:'אתגר ויציאה מאזור הנוחות — שלב רכיב שמחייב את התלמידים להתמודד עם משימה מאתגרת שחורגת מהשגרה. האתגר יכול להיות קוגניטיבי, בינאישי או רגשי.',min:15},
+      {id:'responsibility',name:'אחריות',icon:'🎯',desc:'בעלות ממשית על תוצר או תהליך',prompt:'אחריות — הקצה לתלמידים אחריות ממשית: תכנון, הובלה, הכנת חומרים או קבלת החלטות. האחריות צריכה להיות אותנטית.',min:10},
+      {id:'complexity',name:'תכנים מערערים',icon:'🧩',desc:'מפגש עם דילמות ונקודות מבט שונות',prompt:'תכנים מערערים — שלב סוגיה שאינה ניתנת לפתרון חד-משמעי, הדורשת בחינה מכמה נקודות מבט וגיבוש עמדה אישית.',min:10},
+      {id:'reflection',name:'מסגרת לרפלקציה',icon:'🪞',desc:'עיבוד החוויה — עבר ועתיד',prompt:'מסגרת לרפלקציה — שלב רגע רפלקציה מובנה: מה הייתה ההחלטה הכי קשה? מה למדתי? מה אעשה אחרת?',min:5},
+      {id:'group',name:'קבוצה',icon:'👥',desc:'תלות הדדית וכוח הקולקטיב',prompt:'קבוצה — עצב משימה שדורשת תלות הדדית אמיתית. כל תלמיד מחזיק חלק חיוני.',min:15},
+      {id:'skills',name:'מיומנויות וכלים תומכי Agency',icon:'🧰',desc:'הצבת מטרות, תכנון והפקת לקחים',prompt:'מיומנויות וכלים תומכי Agency — למד במפורש כלי של הכוונה עצמית: הצבת מטרה, פירוק לתוכנית, ניהול זמן.',min:10},
+      {id:'choice',name:'סביבת בחירה, ביטוי והשפעה',icon:'🌍',desc:'בחירה בנושא, בדרך או בתוצר',prompt:'סביבת בחירה — אפשר לתלמידים לבחור בין נושאים, דרכי למידה, או סוגי תוצר. צור במה להצגת תוצרים.',min:5}
+    ];
+
+    function getRecommended(m){
+      if(m<=30)return['reflection','choice'];
+      if(m<=45)return['challenge','responsibility','reflection','choice'];
+      if(m<=90)return['challenge','responsibility','complexity','reflection','skills','choice'];
+      return AGENCY.map(function(p){return p.id;});
+    }
+    function durationLabel(m){
+      if(m<=30)return 'שיעור קצר — מומלץ 2-3 עקרונות';
+      if(m<=45)return 'שיעור סטנדרטי — מומלץ 3-4 עקרונות';
+      if(m<=90)return 'שיעור כפול — מומלץ 5-6 עקרונות';
+      return 'מהלך מורחב — ניתן לשלב את כל 7 העקרונות';
+    }
+
+    function injectOpeningFields(){
+      var w=frame.contentWindow,d=w.document;
+      if(!d||d.getElementById('openingStyle'))return;
+      var inp=d.getElementById('lessonTopic');
+      if(!inp)return;
+      var sec=inp.closest('.section');
+      if(!sec||!sec.parentElement)return;
+
+      var wr=d.createElement('div');
+      wr.className='section';
+      wr.innerHTML='<label class="label">אופי פתיחת השיעור</label>'
+        +'<select id="openingStyle" class="select">'
+        +'<option value="question" selected>שאלה מעוררת חשיבה</option>'
+        +'<option value="prior_knowledge">חיבור לידע קודם</option>'
+        +'<option value="riddle">חידה / אתגר</option>'
+        +'<option value="visual">תמונה / גירוי חזותי</option>'
+        +'<option value="story">סיפורון קצר</option>'
+        +'<option value="game">משחק פתיחה</option>'
+        +'<option value="flexible">פתיחה חופשית לפי שיקול פדגוגי</option>'
+        +'</select>'
+        +'<div class="small" style="margin-top:6px">שדה זה ישפיע במיוחד על מערך השיעור למורה ועל המצגת.</div>'
+        +'<div class="row" style="margin-top:12px"><div>'
+        +'<label class="label">מידת החשיבות של פתיחה חווייתית</label>'
+        +'<select id="openingPriority" class="select">'
+        +'<option value="required">חובה לכלול פתיחה חווייתית</option>'
+        +'<option value="preferred" selected>רצוי לכלול אם מתאים</option>'
+        +'<option value="not_required">לא נדרש</option>'
+        +'</select></div><div>'
+        +'<label class="label">רעיון נוסף לפתיחה (רשות)</label>'
+        +'<input id="openingIdea" class="input" placeholder="למשל: חידה, שאלה על חוויות התלמידים" />'
+        +'</div></div>';
+      sec.insertAdjacentElement('afterend',wr);
+
+      var agSec=d.createElement('div');
+      agSec.className='section';
+      var cards='';
+      for(var i=0;i<AGENCY.length;i++){
+        var p=AGENCY[i];
+        cards+='<label class="ag-card" data-pid="'+p.id+'" data-min="'+p.min+'">'
+          +'<input type="checkbox" class="ag-cb" id="ag_'+p.id+'" value="'+p.id+'" />'
+          +'<span class="ag-icon">'+p.icon+'</span>'
+          +'<div><div class="ag-name">'+p.name+'</div>'
+          +'<div class="ag-desc">'+p.desc+'</div>'
+          +'<div class="ag-time">&#x23F1; מינימום '+p.min+' דק׳</div></div></label>';
+      }
+      agSec.innerHTML='<style>'
+        +'.ag-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}'
+        +'.ag-ttl{font-weight:700;font-size:15px;color:#1a1a1a;display:flex;align-items:center;gap:6px}'
+        +'.ag-badge{background:#ea580c;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}'
+        +'.ag-dur{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}'
+        +'.ag-dur label{font-size:13px;font-weight:600;color:#555;white-space:nowrap}'
+        +'.ag-dur-in{width:80px;padding:6px 10px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;text-align:center;font-family:inherit}'
+        +'.ag-dur-in:focus{outline:none;border-color:#ea580c;box-shadow:0 0 0 3px rgba(234,88,12,.12)}'
+        +'.ag-hint{font-size:11px;color:#ea580c;font-weight:600}'
+        +'.ag-auto{background:#fff7ed;color:#c2410c;border:1.5px solid #fed7aa;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}'
+        +'.ag-auto:hover{background:#ea580c;color:white;border-color:#ea580c}'
+        +'.ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px}'
+        +'.ag-card{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;background:white}'
+        +'.ag-card:hover{border-color:#fed7aa;background:#fffbf5}'
+        +'.ag-card.on{border-color:#ea580c;background:#fff7ed;box-shadow:0 0 0 3px rgba(234,88,12,.08)}'
+        +'.ag-card.dim{opacity:.45}'
+        +'.ag-cb{margin-top:2px;width:16px;height:16px;accent-color:#ea580c;flex-shrink:0;cursor:pointer}'
+        +'.ag-icon{font-size:18px;flex-shrink:0;margin-top:1px}'
+        +'.ag-name{font-size:13px;font-weight:700;color:#1a1a1a}'
+        +'.ag-desc{font-size:11px;color:#78716c;margin-top:1px}'
+        +'.ag-time{font-size:10px;color:#a8a29e;margin-top:2px}'
+        +'.ag-note{font-size:11px;color:#78716c;margin-top:8px;padding:8px 12px;background:#f8fafc;border-radius:8px;border-right:3px solid #ea580c}'
+        +'</style>'
+        +'<div class="ag-hdr"><div class="ag-ttl">&#x1F9ED; שילוב עקרונות פעלנות (Agency) <span class="ag-badge">חדש</span></div></div>'
+        +'<div class="ag-dur"><label>משך השיעור (דקות):</label>'
+        +'<input type="number" id="agDuration" class="ag-dur-in" value="45" min="10" max="300" step="5" />'
+        +'<span id="agHint" class="ag-hint"></span>'
+        +'<button type="button" id="agAuto" class="ag-auto">בחירה אוטומטית לפי זמן</button></div>'
+        +'<div class="ag-grid" id="agGrid">'+cards+'</div>'
+        +'<div class="ag-note">&#x1F4A1; <strong>טיפ:</strong> בשיעור קצר, התמקדו ב-2-3 עקרונות. העקרונות ישולבו בפרומפטים לכל התוצרים.</div>';
+      wr.insertAdjacentElement('afterend',agSec);
+
+      var ctrls=[d.getElementById('openingStyle'),d.getElementById('openingPriority'),d.getElementById('openingIdea')];
+      ctrls.forEach(function(el){
+        if(!el)return;
+        el.addEventListener(el.tagName==='INPUT'?'input':'change',function(){if(typeof w.renderAll==='function')w.renderAll();});
+      });
+
+      var durIn=d.getElementById('agDuration'),hint=d.getElementById('agHint'),autoBtn=d.getElementById('agAuto');
+      function updHint(){
+        var m=parseInt(durIn.value)||0;
+        hint.textContent=m>0?durationLabel(m):'';
+        d.querySelectorAll('.ag-card').forEach(function(c){
+          var mn=parseInt(c.dataset.min)||0;
+          var cb=c.querySelector('.ag-cb');
+          c.classList.toggle('dim',m>0&&m<mn&&!cb.checked);
+        });
+      }
+      function updStyles(){
+        d.querySelectorAll('.ag-card').forEach(function(c){
+          c.classList.toggle('on',c.querySelector('.ag-cb').checked);
+        });
+        if(typeof w.renderAll==='function')w.renderAll();
+      }
+      durIn.addEventListener('input',function(){updHint();if(typeof w.renderAll==='function')w.renderAll();});
+      autoBtn.addEventListener('click',function(){
+        var rec=getRecommended(parseInt(durIn.value)||45);
+        d.querySelectorAll('.ag-cb').forEach(function(cb){cb.checked=rec.includes(cb.value);});
+        updStyles();updHint();
+      });
+      d.querySelectorAll('.ag-cb').forEach(function(cb){cb.addEventListener('change',updStyles);});
+      updHint();
+      autoBtn.click();
+    }
+
+    function getOpeningData(d){
+      return{
+        style:d.getElementById('openingStyle')?.value||'question',
+        priority:d.getElementById('openingPriority')?.value||'preferred',
+        idea:clean(d.getElementById('openingIdea')?.value||'')
+      };
+    }
+
+    function getAgencyData(d){
+      var dur=parseInt(d.getElementById('agDuration')?.value)||0;
+      var sel=[];
+      d.querySelectorAll('.ag-cb:checked').forEach(function(cb){
+        var p=AGENCY.find(function(x){return x.id===cb.value;});
+        if(p)sel.push(p);
+      });
+      return{duration:dur,selected:sel};
+    }
+
+    function openingStyleLabel(v){
+      return{
+        question:'שאלה מעוררת חשיבה',
+        prior_knowledge:'חיבור לידע קודם',
+        riddle:'חידה / אתגר',
+        visual:'תמונה / גירוי חזותי',
+        story:'סיפורון קצר',
+        game:'משחק פתיחה',
+        flexible:'פתיחה חופשית לפי שיקול פדגוגי'
+      }[v]||'פתיחה חווייתית';
+    }
+
+    function openingPriorityLabel(v){
+      return{
+        required:'חובה לכלול פתיחה חווייתית',
+        preferred:'רצוי לכלול אם מתאים',
+        not_required:'לא נדרש'
+      }[v]||'רצוי לכלול אם מתאים';
+    }
+
+    function agencyBlock(ag,product){
+      if(!ag.selected.length)return'';
+      var list=ag.selected.map(function(p,i){return(i+1)+'. '+p.icon+' '+p.prompt;}).join('\n');
+      var timeNote=ag.duration>0?'משך השיעור '+ag.duration+' דקות. התאם את היקף שילוב העקרונות לזמן.':'';
+      var prodNote;
+      if(product==='מערך שיעור למורה') prodNote='שלב את העקרונות בתוך מהלך השיעור — ציין בכל שלב איזה עיקרון מתממש ואיך.';
+      else if(product==='דף עבודה לתרגול') prodNote='עצב שאלות שמזמנות בחירה, רפלקציה או אתגר — לפי העקרונות.';
+      else if(product==='פעילות אינטראקטיבית') prodNote='כלול מרכיבי בחירה, משוב עצמי או אתגר מדורג.';
+      else if(product==='מצגת להקניה') prodNote='שלב שקופיות שמזמנות חשיבה, בחירה או רפלקציה.';
+      else prodNote='שלב את עקרונות הפעלנות בצורה טבעית ומותאמת.';
+      return joinBlocks([
+        '[עקרונות פעלנות לשילוב בתוצר]',
+        'נבחרו '+ag.selected.length+' עקרונות לטיפוח פעלנות תלמידים (Student Agency).',
+        timeNote,
+        prodNote,
+        '',
+        'העקרונות שנבחרו:',
+        list,
+        '',
+        'הנחיות שילוב:',
+        '- שלב כל עיקרון בצורה אורגנית, לא כתוספת מנותקת.',
+        '- התאם את עומק השילוב לזמן הזמין.',
+        '- אל תציין שמות עקרונות לתלמידים, יישם בתכנון.',
+        '- במערך שיעור למורה: ציין בהערות צד איזה עיקרון מתממש בכל שלב.'
+      ]);
+    }
+
+    function formatSourceInstruction(s,d){
+      var mode=s.sourceMode;
+      if(mode==='ai'){
+        var tt=clean(d.getElementById('aiTextType')?.value||'טקסט');
+        var ln=clean(d.getElementById('aiLength')?.value||'בינוני');
+        var tp=clean(d.getElementById('aiTopic')?.value||s.lessonTopic||'');
+        var ll=clean(d.getElementById('aiLanguageLevel')?.value||'');
+        var kw=clean(d.getElementById('aiKeywords')?.value||'');
+        return joinBlocks([
+          'מקור התוכן: יצירה על ידי בינה.',
+          'יש לכתוב תחילה '+tt+' '+ln+(tp?' בנושא "'+tp+'"':'')+(ll?' ברמת שפה '+ll:'')+'.',
+          kw?'שלב את המילים/הרעיונות: '+kw+'.':'',
+          'אם נדרש עיבוד של טקסט הבסיס, בצע לפני הפקת התוצר.'
+        ]);
+      }
+      if(mode==='improve')return joinBlocks(['מקור התוכן: שיפור טקסט קיים על ידי בינה.',clean(s.sourceInstruction)]);
+      if(mode==='upload')return joinBlocks(['מקור התוכן: קובץ שהעלה המשתמש.',clean(s.sourceInstruction)]);
+      return joinBlocks(['מקור התוכן: טקסט שסיפק המשתמש.',clean(s.sourceInstruction)]);
+    }
+
+    function htmlRules(product){
+      var b=[
+        'החזר HTML מלא בלבד.',
+        'הקובץ חייב להיות עצמאי, תקין, RTL מלא וקריא.',
+        'יש להשתמש ב-CSS פנימי בתוך הקובץ.',
+        'יש לכלול עיצוב נוח לקריאה במחשב ובנייד.',
+        'יש להוסיף כפתור גלוי בשם "הורדת קובץ HTML" שמאפשר הורדה של הקובץ למחשב.',
+        'אין להחזיר קטע HTML חלקי ואין להוסיף הסברים מחוץ לקוד.'
+      ];
+      if(['דף עבודה לתרגול','מערך שיעור למורה','קובץ טקסט מלווה לשיעור','מפתח תשובות'].indexOf(product)>=0){
+        b.push('יש לכלול גם סגנונות ידידותיים להדפסה כאשר הדבר רלוונטי לתוצר.');
+      }
+      return b.join('\n');
+    }
+
+    function productInstruction(product,s,opening){
+      var openingText='יש לתכנן פתיחה חווייתית בסגנון "'+openingStyleLabel(opening.style)+'". מידת החשיבות: "'+openingPriorityLabel(opening.priority)+'".'+(opening.idea?' רעיון נוסף: '+opening.idea+'.':'');
+
+      switch(product){
+        case 'מערך שיעור למורה':
+          return joinBlocks([
+            'התוצר הנוכחי: מערך שיעור למורה בלבד.',
+            'צור מערך שיעור מלא למורה כקובץ HTML נפרד.',
+            'השתמש בשאר התוצרים שנבחרו כהקשר תכנוני בלבד, אך אל תיצור אותם כעת.',
+            'בנה את המהלך לפי שלבים: פתיחה וחיבור לידע קודם, הקניה מפורשת, תרגול מונחה, תרגול עצמאי, סיכום ורפלקציה.',
+            'יש להדגיש במיוחד את השלב המרכזי שנבחר בטופס: "'+s.stage+'".',
+            openingText,
+            'כלול: מטרות מיומנות, מטרות תוכן, זמן משוער, הוראות למורה, שאלות מנחות, שימוש בתוצרים שנבחרו, התאמות לרמת הביצוע, ודגשים לשפה ולניקוד לפי שכבת הגיל.',
+            'אין ליצור קבצים אחרים ואין לצרף דף עבודה, מצגת, פעילות או טקסט מלווה בתוך הפלט.'
+          ]);
+        case 'קובץ טקסט מלווה לשיעור':
+          return joinBlocks([
+            'התוצר הנוכחי: קובץ טקסט מלווה לשיעור בלבד.',
+            'צור קובץ HTML נפרד שמכיל רק את הטקסט המלווה לשיעור.',
+            'הטקסט צריך להתאים לכיתה, למיומנות, לנושא השיעור, לרמת השפה ולניקוד שנבחר.',
+            'הוסף כותרת, גוף טקסט ברור, ובמידת הצורך גם מילים קשות או שאלות טרום-קריאה קצרות.',
+            'אם הטקסט שנוצר או עובד אינו מתאים לגיל, יש להתאים אותו לפני הפקת התוצר.',
+            'אין ליצור מערך שיעור, דף עבודה, פעילות אינטראקטיבית, מצגת או מפתח תשובות.'
+          ]);
+        case 'דף עבודה לתרגול':
+          return joinBlocks([
+            'התוצר הנוכחי: דף עבודה לתרגול בלבד.',
+            'צור דף עבודה עם בדיוק '+s.worksheetQuestions+' שאלות.',
+            'כל השאלות חייבות להיות מכוונות ישירות למיומנות "'+s.skill+'" ולשלב גם את נושא התוכן של השיעור.',
+            s.worksheetMode==='interactive'
+              ?'דף העבודה צריך להיות אינטראקטיבי, עם שדות קלט, משוב ברור וכפתורי פעולה מתאימים.'
+              :'דף העבודה צריך להיות מיועד להדפסה, עם ריווח ברור לכתיבה ידנית, שוליים נוחים וחלוקה ברורה.',
+            'אין ליצור מערך שיעור, טקסט מלווה, פעילות אינטראקטיבית נפרדת, מצגת או מפתח תשובות.'
+          ]);
+        case 'פעילות אינטראקטיבית':
+          return joinBlocks([
+            'התוצר הנוכחי: פעילות אינטראקטיבית בלבד.',
+            'צור פעילות אינטראקטיבית עם בדיוק '+s.interactiveItems+' פריטים.',
+            'כל פריט צריך לבדוק או לתרגל את המיומנות "'+s.skill+'".',
+            'הפעילות צריכה להיות ברורה, נגישה, מתאימה לגיל, עם משוב מיידי או אינדיקציה להתקדמות.',
+            'אין ליצור מערך שיעור, דף עבודה, טקסט מלווה, מצגת או מפתח תשובות.'
+          ]);
+        case 'מצגת להקניה':
+          return joinBlocks([
+            'התוצר הנוכחי: מצגת להקניה בלבד.',
+            'צור מצגת ב-HTML שמסבירה ומדגימה את המיומנות "'+s.skill+'", ומשלבת את נושא התוכן.',
+            'יש לכלול רצף שקופיות ברור וקצר, מותאם לגיל היעד, עם הדגמה ודוגמה.',
+            'יש לכלול שקופית פתיחה בהתאם להנחיית הפתיחה: '+openingStyleLabel(opening.style)+'. מידת החשיבות: '+openingPriorityLabel(opening.priority)+'.'+(opening.idea?' רעיון נוסף: '+opening.idea+'.':''),
+            'אין ליצור מערך שיעור, דף עבודה, פעילות אינטראקטיבית, טקסט מלווה או מפתח תשובות.'
+          ]);
+        case 'מפתח תשובות':
+          return joinBlocks([
+            'התוצר הנוכחי: מפתח תשובות בלבד.',
+            'צור מפתח תשובות מותאם לתוצרים הלימודיים שאמורים להיבנות במסגרת השיעור.',
+            'יש לנסח תשובות ברורות, קצרות ומדויקות, מותאמות לשכבת הגיל ולמיומנות.',
+            'אין ליצור את דף העבודה עצמו או תוצרים אחרים.'
+          ]);
+        default:
+          return 'התוצר הנוכחי: '+product+' בלבד.';
+      }
+    }
+
+    function buildSinglePrompt(s,d,product){
+      var opening=getOpeningData(d);
+      var agency=getAgencyData(d);
+      return joinBlocks([
+        '[תפקיד]',
+        'אתה מחולל תוצרים פדגוגיים בעברית. עליך להפיק כעת תוצר אחד בלבד.',
+
+        '[נתוני קלט מחייבים]',
+        'קהל יעד: '+s.gradeLabel+'.',
+        'תחום לימוד: '+s.domain+'.',
+        'נושא בתוך התחום: '+s.topic+'.',
+        'מיומנות ספציפית: '+s.skill+'.',
+        hasText(s.sourceGrade)?'מקור המיומנות שנבחרה: '+s.sourceGrade+'.':'',
+        hasText(s.lessonTopic)?'נושא התוכן של השיעור: '+s.lessonTopic+'.':'',
+        'שלב הוראה מרכזי: '+s.stage+'.',
+        'רמת ביצוע: '+s.level+'.',
+        'מטרות מבחינת המיומנות: '+clean(s.skillGoal),
+        'מטרות מבחינת התוכן: '+clean(s.contentGoal),
+        'דגשים פדגוגיים: '+clean(s.pedagogyGoal),
+        'רמת הניקוד בתוצרים: '+s.nikudLevel+'.',
+        'מה לנקד: '+s.nikudScope+'.',
+        agency.duration>0?'משך השיעור: '+agency.duration+' דקות.':'',
+        hasText(s.worksheetMode)?'סוג דף העבודה: '+(s.worksheetMode==='interactive'?'אינטראקטיבי':'מיועד להדפסה')+'.':'',
+        hasText(s.products?.join(''))?'התוצרים שנבחרו במערכת: '+s.products.join(' , ')+'.':'',
+
+        '[הנחיות מקור התוכן]',
+        formatSourceInstruction(s,d),
+
+        '[כללי עבודה מחייבים]',
+        'הפק כעת תוצר אחד בלבד: "'+product+'".',
+        'השתמש בשאר התוצרים שנבחרו כהקשר בלבד, לא כפלט נוכחי.',
+        'אל תערבב בין כמה תוצרים באותה תשובה.',
+        'אל תוסיף הסברים על תהליך העבודה.',
+        'אל תחזור על כל נתוני הקלט בתוך גוף התוצר.',
+        'אם שדה כלשהו ריק או לא מולא, התעלם ממנו ואל תדפיס ניסוח ריק.',
+        'אם חסר מידע קריטי או יש סתירה מהותית, החזר רק את הכותרת "MISSING INFORMATION:" ולאחריה רשימה קצרה.',
+        'אם נדרש ניקוד, יש להקפיד על ניקוד תקין ועקבי בעברית.',
+
+        '[הנחיות לתוצר הנוכחי]',
+        productInstruction(product,s,opening),
+
+        agencyBlock(agency,product),
+
+        '[כללי HTML]',
+        htmlRules(product)
+      ]);
+    }
+
+    function patchPromptGeneration(){
+      var w=frame.contentWindow,d=w.document;
+      if(!w||!d||!w.buildPrompts||w.__promptPatched)return;
+      var originalPreviewHTML=w.previewHTML;
+
+      w.buildPrompts=function(s){
+        var prompts={};
+        (s.products||[]).forEach(function(product){
+          prompts[product]=buildSinglePrompt(s,d,product);
+        });
+        return prompts;
+      };
+
+      w.previewHTML=function(s){
+        var html=originalPreviewHTML(s);
+        var opening=getOpeningData(d);
+        var agency=getAgencyData(d);
+
+        var agencyInfo=agency.selected.length>0
+          ?'<br><strong>עקרונות פעלנות:</strong> '+agency.selected.map(function(p){return p.icon+' '+p.name;}).join(' | ')
+          :'<br><strong>עקרונות פעלנות:</strong> לא נבחרו';
+
+        var durationInfo=agency.duration>0
+          ?'<br><strong>משך השיעור:</strong> '+agency.duration+' דקות'
+          :'';
+
+        var block='<div class="demo"><strong>מנוע פרומפטים:</strong> תוצר אחד בכל פעם'
+          +'<br><strong>פתיחת שיעור:</strong> '+openingStyleLabel(opening.style)
+          +'<br><strong>מידת חשיבות:</strong> '+openingPriorityLabel(opening.priority)
+          +(opening.idea?'<br><strong>רעיון נוסף:</strong> '+opening.idea:'')
+          +durationInfo
+          +agencyInfo
+          +'</div>';
+        return html.replace('</div></div>',block+'</div></div>');
+      };
+
+      w.__promptPatched=true;
+      if(typeof w.renderAll==='function')w.renderAll();
+    }
+
+    frame.addEventListener('load',function(){
+      setTimeout(function(){
+        injectOpeningFields();
+        patchPromptGeneration();
+      },900);
+    });
+  </script>
+</body>
+</html>
